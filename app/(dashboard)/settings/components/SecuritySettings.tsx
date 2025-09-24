@@ -2,8 +2,39 @@
 
 import { Shield, Key, Clock, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/common/components/Button';
+import DeleteAccountModal from '@/components/common/modals/DeleteAccountModal';
+import { useState } from 'react';
+import Cookies from 'js-cookie';
+import { useSession } from 'next-auth/react';
+import { signOut } from "next-auth/react";
+
 
 export default function SecuritySettings() {
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const { data: session } = useSession();
+  const userId = session?.user?.id || '';
+
+  const handleDeleteAccount = async () => {
+
+    try {
+      const response = await fetch('/api/user/settings', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: userId }) // pass userId here
+      });
+      if (response.ok) {
+        setDeleteModalOpen(false);
+        Cookies.remove('next-auth.session-token');
+        Cookies.remove('__Secure-next-auth.session-token');
+        await signOut({ callbackUrl: '/' });
+      }
+      if (!response.ok) throw new Error('Failed to delete account');
+    }
+    catch (err) {
+      console.log(err);
+    }
+  }
   return (
     <div className="space-y-6">
       <div>
@@ -11,7 +42,7 @@ export default function SecuritySettings() {
           <Shield className="w-5 h-5 mr-2" />
           Security Settings
         </h3>
-        
+
         <div className="space-y-4">
           <div className="bg-black border border-zinc-700 rounded-lg p-4">
             <div className="flex items-center justify-between">
@@ -29,7 +60,7 @@ export default function SecuritySettings() {
               </Button>
             </div>
           </div>
-          
+
           <div className="bg-black border border-zinc-700 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -46,7 +77,7 @@ export default function SecuritySettings() {
               </Button>
             </div>
           </div>
-          
+
           <div className="bg-black border border-zinc-700 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -75,6 +106,7 @@ export default function SecuritySettings() {
               These actions are irreversible. Please proceed with caution.
             </p>
             <Button
+              onClick={() => setDeleteModalOpen(true)}
               variant="destructive"
               size="sm"
               className="bg-red-600 hover:bg-red-700"
@@ -84,6 +116,12 @@ export default function SecuritySettings() {
           </div>
         </div>
       </div>
+      {deleteModalOpen && (
+        <DeleteAccountModal
+          setDeleteAccountModal={setDeleteModalOpen}
+          confirmDelete={handleDeleteAccount}
+        />
+      )}
     </div>
   );
 }

@@ -4,40 +4,46 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Layout from '@/components/layout/Layout';
 import SettingsSkeleton from '@/components/skeletons/SettingsSkeleton';
-import ProfileForm from '@/components/settings/ProfileForm';
-import WidgetSettings from '@/components/settings/WidgetSettings';
-import SecuritySettings from '@/components/settings/SecuritySettings';
-import NotificationSettings from '@/components/settings/NotificationSettings';
+import ProfileForm from '@/app/(dashboard)/settings/components/ProfileForm';
+import WidgetSettings from '@/app/(dashboard)/settings/components/WidgetSettings';
+import SecuritySettings from '@/app/(dashboard)/settings/components/SecuritySettings';
+import NotificationSettings from '@/app/(dashboard)/settings/components/NotificationSettings';
 import { AlertCircle } from 'lucide-react';
 import { signOut } from "next-auth/react";
+import { User, Wrench, Bell, Shield } from "lucide-react";
+
 
 
 export default function SettingsPage() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const [activeTab, setActiveTab] = useState('profile');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
   const tabs = [
-    { id: 'profile', name: 'Profile', icon: '👤' },
-    { id: 'widget', name: 'Widget', icon: '🔧' },
-    { id: 'notifications', name: 'Notifications', icon: '🔔' },
-    { id: 'security', name: 'Security', icon: '🔒' },
+    { id: 'profile', name: 'Profile', icon: User },
+    { id: 'widget', name: 'Widget', icon: Wrench },
+    { id: 'notifications', name: 'Notifications', icon: Bell },
+    { id: 'security', name: 'Security', icon: Shield },
   ];
+
 
   const handleSaveProfile = async (data: any) => {
     setSaving(true);
     setSaveError(null);
-    
+
     try {
       const response = await fetch('/api/user/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-      
+      if (response.ok) {
+        await update();
+      }
+
       if (!response.ok) throw new Error('Failed to save settings');
-      
+
       // Optionally refresh session or show success message
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : 'Failed to save');
@@ -53,9 +59,9 @@ export default function SettingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
       });
-      
+
       if (!response.ok) throw new Error('Failed to delete account');
-      
+
       const result = await response.json();
       console.log('Account deleted successfully', result);
       await signOut({ callbackUrl: "/" });
@@ -115,7 +121,7 @@ export default function SettingsPage() {
           <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
           <p className="text-zinc-400">Manage your account and bot configurations</p>
         </div>
-        
+
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar */}
           <div className="lg:w-64">
@@ -124,19 +130,18 @@ export default function SettingsPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors ${
-                    activeTab === tab.id
+                  className={`w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors ${activeTab === tab.id
                       ? 'bg-blue-600 text-white'
                       : 'text-zinc-300 hover:bg-zinc-800 hover:text-white'
-                  }`}
+                    }`}
                 >
-                  <span className="mr-3 text-lg">{tab.icon}</span>
+                  <tab.icon className="mr-3 h-5 w-5" />
                   {tab.name}
                 </button>
               ))}
             </nav>
           </div>
-          
+
           {/* Content */}
           <div className="flex-1">
             <div className="bg-black border border-zinc-700 rounded-lg p-6">
@@ -145,7 +150,7 @@ export default function SettingsPage() {
                   <p className="text-red-300 text-sm">{saveError}</p>
                 </div>
               )}
-              
+
               {renderTabContent()}
             </div>
           </div>

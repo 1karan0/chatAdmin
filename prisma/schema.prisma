@@ -8,7 +8,128 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/* ---------- ENUMS ---------- */
+model User {
+  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String         @db.VarChar(255)
+  email         String         @unique @db.VarChar(255)
+  image         String?
+  createdAt     DateTime?      @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime?      @updatedAt @db.Timestamp(6)
+  bio           String?
+  location      String?        @db.VarChar(255)
+  website       String?        @db.VarChar(500)
+  workspace     String?        @db.VarChar(255)
+  bots          Bot[]
+  conversations Conversation[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Bot {
+  id                 String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name               String          @db.VarChar(255)
+  description        String?         @db.VarChar(1000)
+  avatar             String?         @db.VarChar(500)
+  status             BotStatus       @default(DRAFT)
+  isPublic           Boolean         @default(false)
+  config             Json            @default("{}")
+  flows              Json            @default("[]")
+  intents            Json            @default("[]")
+  entities           Json            @default("[]")
+  deploymentUrl      String?         @db.VarChar(500)
+  apiKey             String?         @unique @db.VarChar(255)
+  totalConversations Int             @default(0)
+  totalMessages      Int             @default(0)
+  userId             String          @db.Uuid
+  createdAt          DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime        @updatedAt @db.Timestamp(6)
+  analytics          BotAnalytics[]
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversations      Conversation[]
+  knowledgeBase      KnowledgeBase[]
+  theme              Theme?
+
+  @@index([userId])
+  @@index([isPublic, status])
+  @@map("bots")
+}
+
+model Theme {
+  id              String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  botId           String     @unique @db.Uuid
+  primaryColor    String     @db.VarChar(50)
+  secondaryColor  String     @db.VarChar(50)
+  backgroundColor String     @db.VarChar(50)
+  textColor       String     @db.VarChar(50)
+  fontSize        String     @db.VarChar(20)
+  borderRadius    String     @db.VarChar(20)
+  chatWidth       String     @db.VarChar(20)
+  chatHeight      String     @db.VarChar(20)
+  customCSS       String?
+  createdAt       DateTime   @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime   @updatedAt @db.Timestamp(6)
+  fontFamily      FontFamily @default(Inter)
+  chatPosition    String     @db.VarChar(30)
+  bot             Bot        @relation(fields: [botId], references: [id], onDelete: Cascade)
+
+  @@map("themes")
+}
+
+model KnowledgeBase {
+  id        String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  botId     String              @db.Uuid
+  title     String              @db.VarChar(255)
+  content   String
+  metadata  Json?               @default("{}")
+  createdAt DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt DateTime            @updatedAt @db.Timestamp(6)
+  filePath  String?             @db.VarChar(500)
+  fileSize  Int?
+  mimeType  String?             @db.VarChar(100)
+  sourceUrl String?             @db.VarChar(255)
+  status    KnowledgeBaseStatus @default(PENDING)
+  type      KnowledgeBaseType   @default(TEXT)
+  bot       Bot                 @relation(fields: [botId], references: [id], onDelete: Cascade)
+
+  @@index([botId, status])
+  @@map("knowledge_base")
+}
+
+model Conversation {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sessionId String   @db.VarChar(255)
+  userId    String?  @db.Uuid
+  botId     String   @db.Uuid
+  messages  Json     @default("[]")
+  context   Json     @default("{}")
+  metadata  Json     @default("{}")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([botId, sessionId])
+  @@index([userId])
+  @@map("conversations")
+}
+
+model BotAnalytics {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  botId         String   @db.Uuid
+  date          DateTime @db.Date
+  conversations Int      @default(0)
+  messages      Int      @default(0)
+  uniqueUsers   Int      @default(0)
+  createdAt     DateTime @default(now()) @db.Timestamp(6)
+  bot           Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+
+  @@unique([botId, date])
+  @@map("bot_analytics")
+}
+
+/// ---------- ENUMS ----------
 enum BotStatus {
   DRAFT
   PUBLISHED
@@ -34,129 +155,4 @@ enum FontFamily {
   Roboto
   OpenSans
   System
-}
-
-/* ---------- MODELS ---------- */
-
-model User {
-  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String         @db.VarChar(255)
-  email         String         @unique @db.VarChar(255)
-  image         String?        @db.VarChar(500)
-  createdAt     DateTime       @default(now()) @db.Timestamp(6)
-  updatedAt     DateTime       @updatedAt @db.Timestamp(6)
-
-  bots          Bot[]
-  conversations Conversation[]
-
-  @@map("users")
-  @@index([email])
-}
-
-model Bot {
-  id                 String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId             String          @db.Uuid
-  name               String          @db.VarChar(255)
-  description        String?         @db.VarChar(1000)
-  avatar             String?         @db.VarChar(500)
-  status             BotStatus       @default(DRAFT)
-  isPublic           Boolean         @default(false)
-  config             Json            @default("{}")
-  flows              Json            @default("[]")
-  intents            Json            @default("[]")
-  entities           Json            @default("[]")
-  deploymentUrl      String?         @db.VarChar(500)
-  apiKey             String?         @unique @db.VarChar(255)
-  totalConversations Int             @default(0)
-  totalMessages      Int             @default(0)
-  createdAt          DateTime        @default(now()) @db.Timestamp(6)
-  updatedAt          DateTime        @updatedAt @db.Timestamp(6)
-
-  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  theme              Theme?
-  knowledgeBase      KnowledgeBase[]
-  conversations      Conversation[]
-  analytics          BotAnalytics[]
-
-  @@map("bots")
-  @@index([userId])
-  @@index([isPublic, status])
-}
-
-model Theme {
-  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  botId           String       @unique @db.Uuid
-  primaryColor    String       @db.VarChar(50)
-  secondaryColor  String       @db.VarChar(50)
-  backgroundColor String       @db.VarChar(50)
-  textColor       String       @db.VarChar(50)
-  fontFamily      FontFamily   @default(Inter)
-  fontSize        String       @db.VarChar(20)
-  borderRadius    String       @db.VarChar(20)
-  chatPosition    String       @db.VarChar(30)
-  chatWidth       String       @db.VarChar(20)
-  chatHeight      String       @db.VarChar(20)
-  customCSS       String?      @db.Text
-  createdAt       DateTime     @default(now()) @db.Timestamp(6)
-  updatedAt       DateTime     @updatedAt @db.Timestamp(6)
-
-  bot             Bot          @relation(fields: [botId], references: [id], onDelete: Cascade)
-
-  @@map("themes")
-}
-
-model KnowledgeBase {
-  id         String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  botId      String               @db.Uuid
-  title      String               @db.VarChar(255)
-  type       KnowledgeBaseType    @default(TEXT)
-  sourceUrl  String?              @db.VarChar(255)
-  content    String
-  filePath   String?              @db.VarChar(500)
-  fileSize   Int?
-  mimeType   String?              @db.VarChar(100)
-  status     KnowledgeBaseStatus  @default(PENDING)
-  metadata   Json?                @default("{}")
-  createdAt  DateTime             @default(now()) @db.Timestamp(6)
-  updatedAt  DateTime             @updatedAt @db.Timestamp(6)
-
-  bot        Bot                  @relation(fields: [botId], references: [id], onDelete: Cascade)
-
-  @@map("knowledge_base")
-  @@index([botId, status])
-}
-
-model Conversation {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  sessionId String   @db.VarChar(255)
-  userId    String?  @db.Uuid
-  botId     String   @db.Uuid
-  messages  Json     @default("[]")
-  context   Json     @default("{}")
-  metadata  Json     @default("{}")
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
-
-  bot       Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
-  user      User?    @relation(fields: [userId], references: [id])
-
-  @@map("conversations")
-  @@index([botId, sessionId])
-  @@index([userId])
-}
-
-model BotAnalytics {
-  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  botId         String   @db.Uuid
-  date          DateTime @db.Date
-  conversations Int      @default(0)
-  messages      Int      @default(0)
-  uniqueUsers   Int      @default(0)
-  createdAt     DateTime @default(now()) @db.Timestamp(6)
-
-  bot           Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
-
-  @@map("bot_analytics")
-  @@unique([botId, date])
 }

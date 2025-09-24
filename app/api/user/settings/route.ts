@@ -21,6 +21,8 @@ export async function GET(request: NextRequest) {
         name: true,
         email: true,
         image: true,
+        workspace: true,
+        bio: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -55,6 +57,8 @@ export async function PUT(request: NextRequest) {
         ...(name && { name }),
         ...(email && { email }),
         ...(image !== undefined && { image }),
+        ...(bio !== undefined && { bio }),
+        ...(workspace !== undefined && { workspace }),
         // Note: bio field would need to be added to the User model
       },
       select: {
@@ -62,6 +66,8 @@ export async function PUT(request: NextRequest) {
         name: true,
         email: true,
         image: true,
+        workspace: true,
+        bio: true,
         updatedAt: true,
       },
     });

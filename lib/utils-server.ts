@@ -13,6 +13,8 @@ declare module 'next-auth' {
             email: string | null;
             name: string | null;
             image: string | null;
+            workspace: string | null;
+            bio: string | null;
         };
     }
 }
@@ -52,6 +54,8 @@ export const authOptions: AuthOptions = {
                             email: user.email,
                             name: user.name || 'Unknown',
                             image: user.image,
+                            workspace: `${user.name}'s Workspace`,
+                            bio: '',
                         },
                     });
                 }
@@ -77,6 +81,8 @@ export const authOptions: AuthOptions = {
                         email: dbUser.email,
                         name: dbUser.name,
                         image: dbUser.image,
+                        workspace : dbUser.workspace,
+                        bio: dbUser.bio,
 
                     };
                 }

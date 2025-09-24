@@ -62,7 +62,7 @@ export default function MainContent({
               </Avatar>
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">{session?.user?.name}'s Workspace</h1>
+              <h1 className="text-2xl font-bold text-white">{session?.user?.workspace}</h1>
               <p className="text-zinc-400 text-xs">
                 Workspace profile not set.
                 <p className='text-xs'>

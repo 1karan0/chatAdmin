@@ -15,8 +15,8 @@ export default function ProfileForm({ session, onSave, saving }: ProfileFormProp
     name: session?.user?.name || '',
     email: session?.user?.email || '',
     image: session?.user?.image || '',
-    bio: '',
-    workspace: `${session?.user?.name}'s Workspace` || '',
+    bio: session?.user?.bio || '',
+    workspace: ` ${session?.user?.workspace}` || '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
