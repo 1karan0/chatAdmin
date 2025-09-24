@@ -1,16 +1,13 @@
 "use client";
 
-import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { 
   Home, 
   Zap, 
   BarChart3, 
-  CreditCard, 
   Settings, 
   ChevronLeft,
-  Bot,
-  Sparkles
+ 
 } from 'lucide-react';
 import { UsageStat } from '@/types';
 import { useSession } from 'next-auth/react';
@@ -30,12 +27,11 @@ const navigation = [
   { name: 'Settings', icon: Settings, current: false, href: '/settings' },
 ];
 
-export default function Sidebar({ collapsed, mobileOpen, onCollapse, onMobileClose, usageStats }: SidebarProps) {
+export default function Sidebar({ collapsed, mobileOpen, onCollapse, onMobileClose }: SidebarProps) {
   const {data:session}=useSession();
   const router = useRouter();
   const pathname = usePathname();
   
-  const aiSpendStat = usageStats.find(stat => stat.label === 'AI Spend');
 
   const handleNavClick = (href: string) => {
     router.push(href);
@@ -85,26 +81,7 @@ export default function Sidebar({ collapsed, mobileOpen, onCollapse, onMobileClo
               ))}
             </nav>
             
-            {/* AI Spend section */}
-            {!collapsed && aiSpendStat && (
-              <div className="mt-auto px-4 py-4 border-t border-zinc-800">
-                <div className="flex items-center">
-                  <Sparkles className="w-4 h-4 text-blue-400 mr-2" />
-                  <span className="text-sm text-zinc-300">AI Spend</span>
-                </div>
-                <div className="mt-2">
-                  <div className="w-full bg-zinc-800 rounded-full h-2">
-                    <div 
-                      className="bg-blue-500 h-2 rounded-full transition-all duration-500" 
-                      style={{ width: `${aiSpendStat.percentage}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-xs text-zinc-400 mt-1">
-                    ${aiSpendStat.value.toFixed(2)} of ${aiSpendStat.max.toFixed(2)} used
-                  </p>
-                </div>
-              </div>
-            )}
+           
           </div>
           
           {/* Collapse button */}
@@ -151,26 +128,6 @@ export default function Sidebar({ collapsed, mobileOpen, onCollapse, onMobileClo
                 </button>
               ))}
             </nav>
-            
-            {aiSpendStat && (
-              <div className="mt-auto px-4 py-4 border-t border-zinc-800">
-                <div className="flex items-center">
-                  <Sparkles className="w-4 h-4 text-blue-400 mr-2" />
-                  <span className="text-sm text-zinc-300">AI Spend</span>
-                </div>
-                <div className="mt-2">
-                  <div className="w-full bg-zinc-800 rounded-full h-2">
-                    <div 
-                      className="bg-blue-500 h-2 rounded-full transition-all duration-500" 
-                      style={{ width: `${aiSpendStat.percentage}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-xs text-zinc-400 mt-1">
-                    ${aiSpendStat.value.toFixed(2)} of ${aiSpendStat.max.toFixed(2)} used
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>

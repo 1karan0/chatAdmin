@@ -57,13 +57,6 @@ module.exports = {
         border: 'hsl(0, 0%, 20%)',
         input: 'hsl(0, 0%, 10%)',
         ring: 'hsl(255, 100%, 50%)',
-        chart: {
-          1: 'hsl(255, 100%, 50%)',
-          2: 'hsl(200, 70%, 50%)',
-          3: 'hsl(280, 65%, 60%)',
-          4: 'hsl(160, 60%, 45%)',
-          5: 'hsl(30, 80%, 55%)',
-        },
         // ✅ keep extra custom color here too
         'electric-blue': '#ff0080',
       },

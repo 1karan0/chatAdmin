@@ -41,10 +41,6 @@ export default function Dashboard() {
     refetchBots();
   };
 
-  const handleLikeBot = (botId: string) => {
-    console.log('Liked bot:', botId);
-  };
-
   const filteredBots = bots?.filter(bot =>
     bot.name.toLowerCase().includes(searchQuery.toLowerCase())
   ) || [];
@@ -67,7 +63,6 @@ export default function Dashboard() {
           onCreateBot={handleCreateBot}
           onDeleteBot={handleDeleteBot}
           onDeployBot={handleDeployBot}
-          onLikeBot={handleLikeBot}
           loading={botsLoading}
         />
       </div>

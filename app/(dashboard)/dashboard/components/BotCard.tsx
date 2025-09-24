@@ -20,14 +20,12 @@ interface BotCardProps {
   bot: Bot;
   onDelete: (botId: string) => void;
   onDeploy: (botId: string) => void;
-  onLike: (botId: string) => void;
 }
 
 export default function BotCard({
   bot,
   onDelete,
   onDeploy,
-  onLike,
 }: BotCardProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -156,17 +154,8 @@ export default function BotCard({
         </div>
 
         {/* Stats */}
-        <div className="flex items-center justify-between text-sm text-zinc-400 mb-4">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-1">
-              <Eye className="w-4 h-4" />
-              <span>{bot.views}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Heart className="w-4 h-4" />
-              <span>{bot.likes}</span>
-            </div>
-          </div>
+        <div className="flex items-center justify-end text-sm text-zinc-400 mb-4">
+          
           <div className="flex items-center space-x-1">
             <Calendar className="w-4 h-4" />
             <span>{new Date(bot.createdAt).toLocaleDateString()}</span>
@@ -193,14 +182,7 @@ export default function BotCard({
               Deploy
             </Button>
           )}
-          <Button
-            onClick={() => onLike(bot.id)}
-            variant="ghost"
-            size="sm"
-            className="text-zinc-400 hover:text-red-400"
-          >
-            <Heart className="w-4 h-4" />
-          </Button>
+         
         </div>
       </div>
 

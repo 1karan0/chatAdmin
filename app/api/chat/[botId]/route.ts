@@ -22,7 +22,7 @@ export async function POST(
     const { message, sessionId, userId } = body;
 
     // ✅ Enhanced validation
-    if (!message?.trim() || !sessionId) {
+    if (!message || !sessionId) {
       return NextResponse.json(
         { error: 'Message and sessionId are required' }, 
         { status: 400 }
@@ -265,7 +265,6 @@ async function updateBotAnalytics(
       where: { id: botId },
       data: {
         totalMessages: { increment: 1 },
-        lastActivity: new Date(),
       },
     });
   } catch (error) {

@@ -203,21 +203,6 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
             <h3 className="text-lg font-semibold text-white mb-4">Add Text Content</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
-                  Title (optional)
-                </label>
-                <input
-                  type="text"
-                  value={textTitle}
-                  onChange={(e) => setTextTitle(e.target.value)}
-                  placeholder="Content title"
-                  className="w-full px-4 py-3 bg-black border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
-                  Content
-                </label>
                 <textarea
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}

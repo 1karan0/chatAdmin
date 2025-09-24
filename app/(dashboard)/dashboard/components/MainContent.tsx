@@ -16,7 +16,6 @@ interface MainContentProps {
   onCreateBot: () => void;
   onDeleteBot: (botId: string) => void;
   onDeployBot: (botId: string) => void;
-  onLikeBot: (botId: string) => void;
   loading: boolean;
 }
 
@@ -27,7 +26,6 @@ export default function MainContent({
   onCreateBot,
   onDeleteBot,
   onDeployBot,
-  onLikeBot,
   loading
 }: MainContentProps) {
   const { data: session } = useSession();
@@ -146,7 +144,6 @@ export default function MainContent({
                 bot={bot}
                 onDelete={onDeleteBot}
                 onDeploy={onDeployBot}
-                onLike={onLikeBot}
               />
             ))}
 

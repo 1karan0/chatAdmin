@@ -67,7 +67,6 @@ export async function GET(
         .chat-container {
             width: 400px;
             height: 600px;
-            background: white;
             border-radius: 12px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             display: flex;
