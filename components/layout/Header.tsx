@@ -72,27 +72,7 @@ export default function Header({ onMobileMenuToggle, sidebarCollapsed }: HeaderP
 
             <div className="flex items-center space-x-4">
               {/* Search */}
-              <div className="relative">
-                <button 
-                  onClick={() => setSearchOpen(!searchOpen)}
-                  className="text-zinc-400 hover:text-white p-2 rounded-md hover:bg-black transition-colors"
-                >
-                  <Search className="h-5 w-5" />
-                </button>
-                
-                {searchOpen && (
-                  <div className="absolute right-0 mt-2 w-80 bg-black border border-zinc-800 rounded-lg shadow-lg z-50">
-                    <div className="p-4">
-                      <input
-                        type="text"
-                        placeholder="Search bots, settings, or help..."
-                        className="w-full px-3 py-2 bg-black border border-zinc-800 rounded-md text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        autoFocus
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
+             
 
               {/* Notifications */}
               <div className="relative">

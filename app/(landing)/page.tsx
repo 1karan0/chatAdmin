@@ -282,7 +282,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-zinc-800 text-center text-zinc-400">
-            <p>&copy; 2024 BotAgent. All rights reserved.</p>
+            <p>&copy; 2025 BotAgent. All rights reserved.</p>
           </div>
         </div>
       </footer>

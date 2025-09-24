@@ -43,9 +43,9 @@ const AuthModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md glass-effect border-electric-blue/30 border-2">
+      <DialogContent className="sm:max-w-md  glass-effect">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-white text-center mb-6">
+          <DialogTitle className="text-sm font-bold text-white text-center mb-6">
             {title}
           </DialogTitle>
         </DialogHeader>
@@ -77,18 +77,6 @@ const AuthModal = ({
             <span>Continue with GitHub</span>
           </Button>
 
-          <Button
-            onClick={() => handleSocialLogin('azure-ad')}
-            disabled={!!loadingProvider}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-4 px-6 rounded-lg flex items-center justify-center space-x-3 h-12"
-          >
-            {isLoading('azure-ad') ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <FaMicrosoft className="w-5 h-5" />
-            )}
-            <span>Continue with Microsoft</span>
-          </Button>
         </div>
       </DialogContent>
     </Dialog>

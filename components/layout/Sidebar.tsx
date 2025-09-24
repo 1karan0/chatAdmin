@@ -23,7 +23,7 @@ interface SidebarProps {
 const navigation = [
   { name: 'Dashboard', icon: Home, current: true, href: '/dashboard' },
   { name: 'Create Bot', icon: Zap, current: false, href: '/create-bot' },
-  { name: 'Integrations', icon: BarChart3, current: false, href: '/integrations' },
+  // { name: 'Integrations', icon: BarChart3, current: false, href: '/integrations' },
   { name: 'Settings', icon: Settings, current: false, href: '/settings' },
 ];
 
