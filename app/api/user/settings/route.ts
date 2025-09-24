@@ -47,13 +47,14 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, email, bio } = body;
+    const { name, email, bio, image, workspace } = body;
 
     const updatedUser = await prisma.user.update({
       where: { id: session.user.id },
       data: {
         ...(name && { name }),
         ...(email && { email }),
+        ...(image !== undefined && { image }),
         // Note: bio field would need to be added to the User model
       },
       select: {

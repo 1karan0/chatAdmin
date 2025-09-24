@@ -26,8 +26,7 @@ interface SidebarProps {
 const navigation = [
   { name: 'Dashboard', icon: Home, current: true, href: '/dashboard' },
   { name: 'Create Bot', icon: Zap, current: false, href: '/create-bot' },
-  // { name: 'Usage', icon: BarChart3, current: false, href: '/usage' },
-  // { name: 'Billing', icon: CreditCard, current: false, href: '/billing' },
+  { name: 'Integrations', icon: BarChart3, current: false, href: '/integrations' },
   { name: 'Settings', icon: Settings, current: false, href: '/settings' },
 ];
 
@@ -62,7 +61,7 @@ export default function Sidebar({ collapsed, mobileOpen, onCollapse, onMobileClo
               </div>
               {!collapsed && (
                 <div className="">
-                  <p className="text-sm font-medium text-white truncate">codedrill agent</p>
+                  <p className="text-sm font-medium text-white truncate">BotAgent</p>
                   <p className="text-xs text-zinc-400">Admin</p>
                 </div>
               )}
@@ -131,7 +130,7 @@ export default function Sidebar({ collapsed, mobileOpen, onCollapse, onMobileClo
                 <img src="/chatbot-logo.png" alt="" />
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-white">codedrill agent</p>
+                <p className="text-sm font-medium text-white">BotAgent</p>
                 <p className="text-xs text-zinc-400">Admin</p>
               </div>
             </div>

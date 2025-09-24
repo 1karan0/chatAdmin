@@ -1,6 +1,6 @@
-# Botpress-like Chatbot Platform
+# BotAgent - AI Chatbot Platform
 
-A modern, full-stack chatbot platform inspired by Botpress, built with Next.js, TypeScript, and Python.
+A modern, full-stack chatbot platform for creating and deploying AI-powered chatbots, built with Next.js and TypeScript.
 
 ## Features
 
@@ -17,11 +17,11 @@ A modern, full-stack chatbot platform inspired by Botpress, built with Next.js, 
 - Custom CSS support
 
 ### 📚 Knowledge Base
-- **URL Crawling**: Extract content from websites
-- **File Upload**: Support for PDF, DOCX, TXT, CSV, JSON
-- **Text Input**: Direct text content input
-- **Smart Processing**: Python backend for content extraction
-- **Vector Storage**: Ready for embeddings and semantic search
+- **URL Integration**: Connect your website content
+- **File Upload**: Support for multiple document formats
+- **Text Input**: Direct content input
+- **Smart Processing**: Automated content extraction
+- **Knowledge Management**: Organized content storage
 
 ### 🚀 Deployment
 - One-click bot deployment
@@ -39,18 +39,13 @@ A modern, full-stack chatbot platform inspired by Botpress, built with Next.js, 
 - **Prisma** - Database ORM
 - **NextAuth.js** - Authentication
 
-### Backend
-- **PostgreSQL** - Primary database
-- **Python FastAPI** - Knowledge processing
-- **BeautifulSoup** - Web scraping
-- **PyPDF2** - PDF processing
-- **python-docx** - Word document processing
+### Database
+- **PostgreSQL** - Primary database with Prisma ORM
 
 ## Getting Started
 
 ### Prerequisites
 - Node.js 18+
-- Python 3.8+
 - PostgreSQL database
 
 ### Installation
@@ -78,25 +73,11 @@ npx prisma generate
 npx prisma db push
 ```
 
-5. **Set up Python backend**
-```bash
-cd python-backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-6. **Start the development servers**
+5. **Start the development server**
 
 Frontend:
 ```bash
 npm run dev
-```
-
-Python backend:
-```bash
-cd python-backend
-python main.py
 ```
 
 ## Environment Variables
@@ -116,9 +97,6 @@ GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
 GITHUB_ID="your-github-client-id"
 GITHUB_SECRET="your-github-client-secret"
-
-# Python Backend
-PYTHON_BACKEND_URL="http://localhost:8000"
 ```
 
 ## Project Structure
@@ -133,10 +111,8 @@ PYTHON_BACKEND_URL="http://localhost:8000"
 │   ├── ui/              # UI components
 │   ├── common/          # Common components
 │   ├── layout/          # Layout components
+│   ├── settings/        # Settings components
 │   └── skeletons/       # Loading skeletons
-├── python-backend/      # Python processing backend
-│   ├── main.py         # FastAPI application
-│   └── requirements.txt # Python dependencies
 ├── prisma/             # Database schema and migrations
 ├── types/              # TypeScript type definitions
 └── lib/                # Utility functions
@@ -152,12 +128,12 @@ The bot creation process is divided into steps:
 4. **Review**: Final review before creation
 
 ### Knowledge Processing
-The Python backend handles:
-- Web scraping with BeautifulSoup
-- PDF text extraction with PyPDF2
-- Word document processing with python-docx
-- Text chunking for better context
-- Vector data preparation (ready for embeddings)
+The platform handles:
+- URL content extraction
+- File processing for multiple formats
+- Text content management
+- Knowledge base organization
+- Content indexing for bot training
 
 ### Theme System
 Comprehensive theming with:
@@ -185,22 +161,12 @@ Optimized for scalability:
 - `POST /api/knowledge/process` - Knowledge processing
 - `POST /api/chat/[botId]` - Chat interactions
 
-### Python Backend API
-- `POST /process-knowledge` - Process knowledge items
-- `GET /health` - Health check
-
 ## Deployment
 
 ### Frontend (Vercel/Netlify)
 1. Connect your repository
 2. Set environment variables
 3. Deploy
-
-### Python Backend (Railway/Heroku)
-1. Create a new service
-2. Connect the `python-backend` directory
-3. Set environment variables
-4. Deploy
 
 ### Database (Supabase/PlanetScale)
 1. Create a new database

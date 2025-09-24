@@ -94,7 +94,7 @@ export default function LandingPage() {
               <div className="w-20 rounded-lg flex items-center justify-center">
                 <img src="/chatbot-logo.png" alt=""  className=''/>
               </div>
-              <span className="text-xl font-bold">Codedrill Agent</span>
+              <span className="text-xl font-bold">BotAgent</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-zinc-300 hover:text-white transition-colors">Features</a>
@@ -272,7 +272,6 @@ export default function LandingPage() {
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <Bot className="w-5 h-5 text-white" />
-                <img src="" alt="" />
               </div>
               <span className="text-xl font-bold">BotAgent</span>
             </div>
