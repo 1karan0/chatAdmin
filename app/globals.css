@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- Root CSS variables ---------- */
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 15, 15, 15;
+
+  --background: 0 0% 0%;
+  --foreground: 0 0% 95%;
+  --card: 0 0% 5%;
+  --card-foreground: 0 0% 95%;
+  --popover: 0 0% 8%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 255 100% 50%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 0 0% 95%;
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 65%;
+  --accent: 255 100% 45%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 20%;
+  --input: 0 0% 10%;
+  --ring: 255 100% 50%;
+  --radius: 0.5rem;
+  --chart-1: 255 100% 50%;
+  --chart-2: 200 70% 50%;
+  --chart-3: 280 65% 60%;
+  --chart-4: 160 60% 45%;
+  --chart-5: 30 80% 55%;
+}
+
+/* ---------- Base styles ---------- */
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ---------- Custom scrollbar ---------- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-zinc-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-zinc-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-zinc-500;
+}
+
+/* ---------- Extra utilities ---------- */
+@layer utilities {
+  .bg-zinc-750 {
+    background-color: rgb(31, 41, 55);
+    font-family: 'Inter',sans-serif;
+  }
+
+  .transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .glass-effect {
+    backdrop-filter: blur(10px);
+    background: rgba(17, 24, 39, 0.8);
+  }
+}
+
+@keyframes slow-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-slow-spin {
+  animation: slow-spin 5s linear infinite;
+}
