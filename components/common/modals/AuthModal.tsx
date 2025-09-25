@@ -38,12 +38,6 @@ const AuthModal = ({
       setLoadingProvider(null);
     }
   };
-   console.log("next auth secret === ",process.env.NEXTAUTH_SECRET);
-  console.log("google client id === ",process.env.GOOGLE_CLIENT_ID);
-  console.log("google client secret === ",process.env.GOOGLE_CLIENT_SECRET);
-  console.log("github id === ",process.env.GITHUB_ID);
-  console.log("github secret === ",process.env.GITHUB_SECRET);
-  console.log("next auth url === ",process.env.NEXTAUTH_URL);
 
   const isLoading = (provider: string) => loadingProvider === provider;
 
