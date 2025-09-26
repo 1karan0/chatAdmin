@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
+
 const features = [
   {
     icon: <Bot className="w-6 h-6" />,
