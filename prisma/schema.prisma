@@ -21,6 +21,7 @@ model User {
   workspace     String?        @db.VarChar(255)
   bots          Bot[]
   conversations Conversation[]
+  tenantId      String?       
 
   @@index([email])
   @@map("users")

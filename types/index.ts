@@ -63,6 +63,7 @@ export interface User {
   avatar: string;
   workspace: string;
   emailVerified: boolean;
+  tenantId?: string | null;
 }
 
 export interface BotFormData {
