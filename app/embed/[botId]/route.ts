@@ -10,6 +10,7 @@ interface EmbedRouteContext {
 
 const prisma = new PrismaClient();
 
+
 // GET /embed/[botId] - Serve bot embed page
 export async function GET(
   request: NextRequest,
@@ -22,6 +23,7 @@ export async function GET(
       include: {
         theme: true,
         knowledgeBase: true,
+        user: true,
       },
 
     });
@@ -40,6 +42,8 @@ export async function GET(
       }
     }
     const theme = bot.theme ;
+    const user = bot.user;
+    const tenantId = user?.tenantId || '';
 
     const html = `
 <!DOCTYPE html>
@@ -235,6 +239,16 @@ export async function GET(
     </div>
 
     <script>
+        function getCookie(name) {
+            const value = \`; \${document.cookie}\`;
+            const parts = value.split(\`; \${name}=\`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        // Usage
+        const tenantId = getCookie('tenant_id');
+        console.log("tenant id ======", tenantId);
+
         const messagesContainer = document.getElementById('messages');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
@@ -276,44 +290,48 @@ export async function GET(
         }
         
         async function sendMessage(text = null) {
+            // Only use the text value, not event or object
             const message = text || messageInput.value.trim();
             if (!message) return;
-            
+
             if (!text) {
                 messageInput.value = '';
             }
-            
+
             addMessage(message, true);
             sendButton.disabled = true;
             showTyping();
-            
+
             try {
-                const response = await fetch('/api/chat/${botId}', {
+                const response = await fetch('http://localhost:8000/chat/ask', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        message,
-                        sessionId,
+                        question: message, // must be a string
+                        tenant_id: "${tenantId}" // must be a string
                     }),
                 });
-                
+
                 const data = await response.json();
-                
-                if (data.response) {
+
+                if (data.answer) {
                     hideTyping();
-                    addMessage(data.response.text, false, data.response.quickReplies);
+                    addMessage(data.answer, false);
+                } else if (data.detail) {
+                    hideTyping();
+                    addMessage(data.detail, false);
                 }
             } catch (error) {
                 hideTyping();
                 addMessage('Sorry, something went wrong. Please try again.', false);
             }
-            
+
             sendButton.disabled = false;
         }
         
-        sendButton.addEventListener('click', sendMessage);
+        sendButton.addEventListener('click', () => sendMessage());
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 sendMessage();

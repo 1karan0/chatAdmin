@@ -84,7 +84,7 @@ export const authOptions: AuthOptions = {
               email: user.email,
               name: user.name || "Unknown",
               image: user.image,
-              workspace: tenantName,
+              workspace: `${user.name || "User"}'s workspace`,
               bio: "",
               tenantId,
             },

@@ -17,6 +17,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+    <script src="http://localhost:3000/embed/1a1e6291-450b-4cb2-9550-5f8cd6786216/widget.js"></script>
+      </head>
       <body className={`${inter.className} bg-zinc-900`}><DefaultLayout>{children}</DefaultLayout></body>
     </html>
   );

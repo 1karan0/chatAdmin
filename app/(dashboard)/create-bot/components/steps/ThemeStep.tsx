@@ -33,7 +33,9 @@ const presetThemes = [
       primaryColor: '#0ea5e9',
       secondaryColor: '#64748b',
       backgroundColor: '#ffffff',
-      textColor: '#1e293b',
+      yourtextColor: '#ffffff',
+      chattextColor: '#1e293b',
+      bottomColor: '#0ea5e9',
     }
   },
   {
@@ -43,7 +45,9 @@ const presetThemes = [
       primaryColor: '#8b5cf6',
       secondaryColor: '#6b7280',
       backgroundColor: '#111827',
-      textColor: '#f9fafb',
+      yourtextColor: '#f9fafb',
+      chattextColor: '#ffffff',
+      bottomColor: '#8b5cf6',
     }
   },
   {
@@ -53,7 +57,9 @@ const presetThemes = [
       primaryColor: '#10b981',
       secondaryColor: '#6b7280',
       backgroundColor: '#ffffff',
-      textColor: '#1f2937',
+      yourtextColor: '#1f2937',
+      chattextColor: '#1f2937',
+      bottomColor: '#10b981',
     }
   },
   {
@@ -61,9 +67,11 @@ const presetThemes = [
     gradient: 'from-orange-400 to-red-500',
     colors: {
       primaryColor: '#f59e0b',
-      secondaryColor: '#6b7280',
+      secondaryColor: '#f3dec0ff',
       backgroundColor: '#ffffff',
-      textColor: '#1f2937',
+      yourtextColor: '#ffffff',
+      chattextColor: '#1e293b',
+      bottomColor: '#f59e0b',
     }
   },
   {
@@ -73,7 +81,9 @@ const presetThemes = [
       primaryColor: '#a855f7',
       secondaryColor: '#6b7280',
       backgroundColor: '#ffffff',
-      textColor: '#1f2937',
+      yourtextColor: '#1f2937',
+      chattextColor: '#1f2937',
+      bottomColor: '#a855f7',
     }
   },
   {
@@ -83,7 +93,9 @@ const presetThemes = [
       primaryColor: '#14b8a6',
       secondaryColor: '#6b7280',
       backgroundColor: '#ffffff',
-      textColor: '#1f2937',
+      yourtextColor: '#1f2937',
+      chattextColor: '#1f2937',
+      bottomColor: '#14b8a6',
     }
   },
 ];
@@ -196,7 +208,8 @@ export default function ThemeStep({ formData, updateFormData }: Props) {
                     { key: 'primaryColor', label: 'Primary Color', desc: 'Main accent color' },
                     { key: 'secondaryColor', label: 'Secondary Color', desc: 'Supporting elements' },
                     { key: 'backgroundColor', label: 'Background Color', desc: 'Chat background' },
-                    { key: 'textColor', label: 'Text Color', desc: 'Main text color' }
+                    { key: 'yourtextColor', label: 'Text Color', desc: 'Main text color' },
+                    { key: 'chattextColor', label: 'Chat Text Color', desc: 'Chat message text' },
                   ].map((color) => (
                     <div key={color.key} className="bg-zinc-700/30 rounded-xl p-4 border border-zinc-600/30">
                       <label className="block text-sm font-medium text-zinc-300 mb-2">
@@ -399,7 +412,7 @@ export default function ThemeStep({ formData, updateFormData }: Props) {
                       className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shadow-lg"
                       style={{
                         backgroundColor: formData.theme.primaryColor,
-                        color: formData.theme.textColor
+                        color: formData.theme.yourtextColor
                       }}
                     >
                       AI
@@ -408,7 +421,7 @@ export default function ThemeStep({ formData, updateFormData }: Props) {
                       className="max-w-xs p-3 rounded-2xl text-sm shadow-md"
                       style={{
                         backgroundColor: formData.theme.secondaryColor + "20",
-                        color: formData.theme.textColor,
+                        color: formData.theme.chattextColor,
                         borderRadius: formData.theme.borderRadius,
                       }}
                     >
@@ -444,7 +457,7 @@ export default function ThemeStep({ formData, updateFormData }: Props) {
                       className="max-w-xs p-3 rounded-2xl text-sm shadow-md"
                       style={{
                         backgroundColor: formData.theme.secondaryColor + '20',
-                        color: formData.theme.textColor,
+                        color: formData.theme.chattextColor,
                         borderRadius: formData.theme.borderRadius,
                       }}
                     >
@@ -462,7 +475,8 @@ export default function ThemeStep({ formData, updateFormData }: Props) {
                 </div>
 
                 {/* Chat Input */}
-                <div className="p-4 border-t mt-40  border-zinc-200/20">
+                <div className={`p-4 border-t mt-40  border-zinc-200/20 `}
+                >
                   <div className="flex items-center space-x-3">
                     <input
                       type="text"

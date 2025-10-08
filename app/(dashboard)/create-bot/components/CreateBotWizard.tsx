@@ -32,7 +32,9 @@ export interface BotFormData {
     primaryColor: string;
     secondaryColor: string;
     backgroundColor: string;
-    textColor: string;
+    yourtextColor: string;
+    chattextColor: string;
+    bottomColor: string;
     fontFamily: string;
     fontSize: string;
     borderRadius: string;
@@ -56,7 +58,9 @@ const initialFormData: BotFormData = {
     primaryColor: "#0ea5e9",
     secondaryColor: "#64748b",
     backgroundColor: "#ffffff",
-    textColor: "#1e293b",
+    yourtextColor: "#1e293b",
+    chattextColor: "#1e293b",
+    bottomColor: "#0ea5e9",
     fontFamily: "Inter",
     fontSize: "14px",
     borderRadius: "8px",

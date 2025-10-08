@@ -86,7 +86,9 @@ export interface BotTheme {
   primaryColor: string;
   secondaryColor: string;
   backgroundColor: string;
-  textColor: string;
+  yourtextColor: string;
+  chattextColor: string;
+  bottomColor: string;
   fontFamily: string;
   fontSize: string;
   borderRadius: string;
