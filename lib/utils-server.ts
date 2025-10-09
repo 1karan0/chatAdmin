@@ -49,7 +49,7 @@ export const authOptions: AuthOptions = {
         // If user doesn't exist, create one
         if (!dbUser) {
           // Generate a unique tenant_id for the Python backend
-          const tenantId = `tenant_${crypto.randomUUID()}`;
+          const tenantId = `${crypto.randomUUID()}`;
           const tenantName = `${user.name || "User"}'s tenant`;
           const username = user.email?.split("@")[0] || "user";
 

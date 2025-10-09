@@ -31,7 +31,7 @@ const presetThemes = [
     gradient: 'from-blue-500 to-cyan-400',
     colors: {
       primaryColor: '#0ea5e9',
-      secondaryColor: '#64748b',
+      secondaryColor: '#e0f2fe',
       backgroundColor: '#ffffff',
       yourtextColor: '#ffffff',
       chattextColor: '#1e293b',
@@ -55,9 +55,9 @@ const presetThemes = [
     gradient: 'from-green-500 to-emerald-600',
     colors: {
       primaryColor: '#10b981',
-      secondaryColor: '#6b7280',
+      secondaryColor: '#d1fae5',
       backgroundColor: '#ffffff',
-      yourtextColor: '#1f2937',
+      yourtextColor: '#ffffff',
       chattextColor: '#1f2937',
       bottomColor: '#10b981',
     }
@@ -67,7 +67,7 @@ const presetThemes = [
     gradient: 'from-orange-400 to-red-500',
     colors: {
       primaryColor: '#f59e0b',
-      secondaryColor: '#f3dec0ff',
+      secondaryColor: '#fed7aa',
       backgroundColor: '#ffffff',
       yourtextColor: '#ffffff',
       chattextColor: '#1e293b',
@@ -79,9 +79,9 @@ const presetThemes = [
     gradient: 'from-purple-400 to-pink-400',
     colors: {
       primaryColor: '#a855f7',
-      secondaryColor: '#6b7280',
+      secondaryColor: '#f3e8ff',
       backgroundColor: '#ffffff',
-      yourtextColor: '#1f2937',
+      yourtextColor: '#ffffff',
       chattextColor: '#1f2937',
       bottomColor: '#a855f7',
     }
@@ -91,9 +91,9 @@ const presetThemes = [
     gradient: 'from-teal-400 to-green-400',
     colors: {
       primaryColor: '#14b8a6',
-      secondaryColor: '#6b7280',
+      secondaryColor: '#ccfbf1',
       backgroundColor: '#ffffff',
-      yourtextColor: '#1f2937',
+      yourtextColor: '#ffffff',
       chattextColor: '#1f2937',
       bottomColor: '#14b8a6',
     }
@@ -206,10 +206,10 @@ export default function ThemeStep({ formData, updateFormData }: Props) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {[
                     { key: 'primaryColor', label: 'Primary Color', desc: 'Main accent color' },
-                    { key: 'secondaryColor', label: 'Secondary Color', desc: 'Supporting elements' },
+                    { key: 'secondaryColor', label: 'Secondary Color', desc: 'Bot message background' },
                     { key: 'backgroundColor', label: 'Background Color', desc: 'Chat background' },
-                    { key: 'yourtextColor', label: 'Text Color', desc: 'Main text color' },
-                    { key: 'chattextColor', label: 'Chat Text Color', desc: 'Chat message text' },
+                    { key: 'yourtextColor', label: 'Your Text Color', desc: 'User message text' },
+                    { key: 'chattextColor', label: 'Chat Text Color', desc: 'Bot message text' },
                   ].map((color) => (
                     <div key={color.key} className="bg-zinc-700/30 rounded-xl p-4 border border-zinc-600/30">
                       <label className="block text-sm font-medium text-zinc-300 mb-2">
@@ -362,142 +362,241 @@ export default function ThemeStep({ formData, updateFormData }: Props) {
                 </div>
               </div>
             )}
-
-            
           </div>
         </div>
 
-        {/* Live Preview Panel */}
+        {/* Live Preview Panel - UPDATED */}
         <div className="space-y-6">
-          <div className="bg-zinc-800/30 backdrop-blur-sm rounded-2xl p-6 border border-zinc-700/30 sticky top-6">  
+          <div className="bg-zinc-800/30 backdrop-blur-sm rounded-2xl p-6 border border-zinc-700/30 sticky top-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white flex items-center">
+                <Eye className="w-5 h-5 mr-2 text-blue-400" />
+                Live Preview
+              </h3>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setPreviewMode('desktop')}
+                  className={`p-2 rounded-lg transition-all ${previewMode === 'desktop'
+                      ? 'bg-blue-500/20 text-blue-400'
+                      : 'text-zinc-400 hover:text-white'
+                    }`}
+                >
+                  <Monitor className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setPreviewMode('mobile')}
+                  className={`p-2 rounded-lg transition-all ${previewMode === 'mobile'
+                      ? 'bg-blue-500/20 text-blue-400'
+                      : 'text-zinc-400 hover:text-white'
+                    }`}
+                >
+                  <Smartphone className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
 
-            <div className={`bg-zinc-900/50 rounded-xl p-6 ${previewMode === 'mobile' ? 'max-w-sm mx-auto' : ''}`}>
+            <div className={`bg-zinc-900/50 rounded-xl p-6 flex items-center justify-center`}
+              style={{
+                maxWidth: previewMode === 'mobile' ? '350px' : '600px',
+                width: '100%',
+                margin: '0 auto',
+              }}
+            >
               <div
-                className="rounded-xl shadow-2xl border border-zinc-600/30"
+                className={`flex flex-col border overflow-hidden shadow-2xl xl:ml-10`}
                 style={{
-                  width: previewMode === 'mobile' ? '280px' : formData.theme.chatWidth,
-                  height: previewMode === 'mobile' ? '400px' : formData.theme.chatHeight,
-                  backgroundColor: formData.theme.backgroundColor,
-                  fontFamily: formData.theme.fontFamily,
-                  fontSize: formData.theme.fontSize,
-                  borderRadius: formData.theme.borderRadius,
+                  width: previewMode === 'mobile' ? '320px' : formData.theme.chatWidth || '380px',
+                  height: previewMode === 'mobile' ? '500px' : formData.theme.chatHeight || '600px',
+                  backgroundColor: formData.theme.backgroundColor || '#ffffff',
+                  fontFamily: formData.theme.fontFamily || 'Inter',
+                  borderRadius: formData.theme.borderRadius || '16px',
+                  minWidth: '350px',
+                  maxWidth: '100%',
                 }}
               >
-                {/* Chat Header */}
+                {/* Chat Header with Gradient */}
                 <div
-                  className="p-4 flex  space-x-3 relative overflow-hidden"
-                  style={{ backgroundColor: formData.theme.primaryColor }}
+                  className="p-5 flex items-center gap-3 relative overflow-hidden"
+                  style={{
+                    background: `linear-gradient(135deg, ${formData.theme.primaryColor || '#667eea'}, ${formData.theme.primaryColor ? `color-mix(in srgb, ${formData.theme.primaryColor} 80%, #000)` : '#764ba2'})`,
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                  }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/10"></div>
-                  <div className="relative w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                    <span className="text-white text-sm font-bold">
-                      {formData.name ? formData.name.charAt(0).toUpperCase() : 'A'}
-                    </span>
+                  {/* Avatar */}
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-base backdrop-blur-sm"
+                    style={{
+                      background: 'rgba(255,255,255,0.2)',
+                      color: formData.theme.yourtextColor || '#ffffff',
+                    }}
+                  >
+                    {formData.name ? formData.name.charAt(0).toUpperCase() : 'A'}
                   </div>
-                  <div className="relative">
-                    <h4 className="text-white font-semibold text-sm">
+
+                  {/* Bot Info */}
+                  <div className="flex-1">
+                    <h4
+                      className="font-semibold text-base"
+                      style={{
+                        color: formData.theme.yourtextColor || '#ffffff',
+                        letterSpacing: '-0.2px',
+                      }}
+                    >
                       {formData.name || 'AI Assistant'}
                     </h4>
-                    <p className="text-white/80 text-xs flex items-center">
-                      <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-                      Online now
-                    </p>
-                  </div>
-                </div>
-
-                {/* Chat Messages */}
-                <div className="p-4 space-y-4 overflow-y-auto">
-                  <div className="flex items-start space-x-3">
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shadow-lg"
-                      style={{
-                        backgroundColor: formData.theme.primaryColor,
-                        color: formData.theme.yourtextColor
-                      }}
-                    >
-                      AI
-                    </div>
-                    <div
-                      className="max-w-xs p-3 rounded-2xl text-sm shadow-md"
-                      style={{
-                        backgroundColor: formData.theme.secondaryColor + "20",
-                        color: formData.theme.chattextColor,
-                        borderRadius: formData.theme.borderRadius,
-                      }}
-                    >
-                      Hello! I'm your AI assistant. How can I help you today?
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-3 justify-end">
-                    <div
-                      className="max-w-xs p-3 rounded-2xl text-sm shadow-md"
-                      style={{
-                        backgroundColor: formData.theme.primaryColor,
-                        color: 'white',
-                        borderRadius: formData.theme.borderRadius,
-                      }}
-                    >
-                      I need help with my account settings
-                    </div>
-                    <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full shadow-lg"></div>
-                  </div>
-
-                  <div className="flex items-start space-x-3">
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shadow-lg"
-                      style={{
-                        backgroundColor: formData.theme.primaryColor,
-                        color: 'white'
-                      }}
-                    >
-                      AI
-                    </div>
-                    <div
-                      className="max-w-xs p-3 rounded-2xl text-sm shadow-md"
-                      style={{
-                        backgroundColor: formData.theme.secondaryColor + '20',
-                        color: formData.theme.chattextColor,
-                        borderRadius: formData.theme.borderRadius,
-                      }}
-                    >
-                      I'd be happy to help you with your account! What specific settings would you like to modify? 🔧
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-center">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <div
+                        className="w-1.5 h-1.5 rounded-full"
+                        style={{
+                          background: '#4ade80',
+                          boxShadow: '0 0 0 0 rgba(74, 222, 128, 0.7)',
+                          animation: 'pulse 2s infinite',
+                        }}
+                      ></div>
+                      <p
+                        className="text-xs opacity-90"
+                        style={{ color: formData.theme.yourtextColor || '#ffffff' }}
+                      >
+                        Online
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Chat Input */}
-                <div className={`p-4 border-t mt-40  border-zinc-200/20 `}
+                {/* Messages Container */}
+                <div
+                  className="flex-1 p-5 space-y-3.5 overflow-y-auto"
+                  style={{
+                    background: formData.theme.backgroundColor ,
+                  }}
                 >
-                  <div className="flex items-center space-x-3">
+                  {/* Bot Message */}
+                  <div className="flex items-start gap-2 max-w-[75%]">
+                    <div
+                      className="px-4 py-3 rounded-2xl"
+                      style={{
+                        background: formData.theme.secondaryColor || '#ffffff',
+                        color: formData.theme.chattextColor || '#1a1a1a',
+                        fontSize: formData.theme.fontSize || '14px',
+                        lineHeight: '1.5',
+                        borderBottomLeftRadius: '4px',
+                        border: '1px solid rgba(0,0,0,0.06)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                      }}
+                    >
+                      Hey! How can I help you today?
+                    </div>
+                  </div>
+
+                  {/* User Message */}
+                  <div className="flex items-start gap-2 max-w-[75%] ml-auto justify-end">
+                    <div
+                      className="px-4 py-3 rounded-2xl"
+                      style={{
+                        background: `linear-gradient(135deg, ${formData.theme.primaryColor || '#667eea'}, ${formData.theme.primaryColor ? `color-mix(in srgb, ${formData.theme.primaryColor} 90%, #000)` : '#764ba2'})`,
+                        color: formData.theme.yourtextColor || '#ffffff',
+                        fontSize: formData.theme.fontSize || '14px',
+                        lineHeight: '1.5',
+                        borderBottomRightRadius: '4px',
+                        boxShadow: '0 2px 12px rgba(102, 126, 234, 0.2)',
+                      }}
+                    >
+                      I need help with my account
+                    </div>
+                  </div>
+
+                  {/* Bot Message */}
+                  <div className="flex items-start gap-2 max-w-[75%]">
+                    <div
+                      className="px-4 py-3 rounded-2xl"
+                      style={{
+                        background: formData.theme.secondaryColor || '#ffffff',
+                        color: formData.theme.chattextColor || '#1a1a1a',
+                        fontSize: formData.theme.fontSize || '14px',
+                        lineHeight: '1.5',
+                        borderBottomLeftRadius: '4px',
+                        border: '1px solid rgba(0,0,0,0.06)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                      }}
+                    >
+                      I'd be happy to help you! 🔧
+                    </div>
+                  </div>
+
+                  {/* Typing Indicator */}
+                  <div className="flex items-center gap-1.5 px-4 py-3 rounded-2xl w-16"
+                    style={{
+                      background: formData.theme.secondaryColor || '#ffffff',
+                      border: '1px solid rgba(0,0,0,0.06)',
+                      borderBottomLeftRadius: '4px',
+                    }}
+                  >
+                    <div
+                      className="w-2 h-2 rounded-full"
+                      style={{
+                        background: formData.theme.primaryColor || '#667eea',
+                        animation: 'bounce 1.4s infinite ease-in-out both',
+                        animationDelay: '-0.32s',
+                      }}
+                    ></div>
+                    <div
+                      className="w-2 h-2 rounded-full"
+                      style={{
+                        background: formData.theme.primaryColor || '#667eea',
+                        animation: 'bounce 1.4s infinite ease-in-out both',
+                        animationDelay: '-0.16s',
+                      }}
+                    ></div>
+                    <div
+                      className="w-2 h-2 rounded-full"
+                      style={{
+                        background: formData.theme.primaryColor || '#667eea',
+                        animation: 'bounce 1.4s infinite ease-in-out both',
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Input Area */}
+                <div
+                  className="p-4 border-t"
+                  style={{
+                    background: formData.theme.backgroundColor || '#ffffff',
+                    borderColor: 'rgba(0,0,0,0.06)',
+                  }}
+                >
+                  <div
+                    className="flex items-center gap-2.5 p-2 rounded-3xl"
+                    style={{
+                      background: formData.theme.secondaryColor || '#f1f3f5',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                    }}
+                  >
                     <input
                       type="text"
                       placeholder="Type your message..."
-                      className="flex-1 px-4 py-3 border rounded-full text-sm bg-zinc-50/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      className="flex-1 px-4 py-2.5 bg-transparent border-0 outline-none"
                       style={{
-                        borderColor: formData.theme.secondaryColor + '40',
-                        borderRadius: formData.theme.borderRadius,
-                        fontSize: formData.theme.fontSize,
+                        color: formData.theme.chattextColor || '#1a1a1a',
+                        fontSize: formData.theme.fontSize || '14px',
                       }}
                       readOnly
                     />
                     <button
-                      className="px-6 py-3 rounded-full text-white text-sm font-medium shadow-lg "
+                      className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
                       style={{
-                        backgroundColor: formData.theme.primaryColor,
-                        borderRadius: formData.theme.borderRadius,
+                        background: `linear-gradient(135deg, ${formData.theme.primaryColor || '#667eea'}, ${formData.theme.primaryColor ? `color-mix(in srgb, ${formData.theme.primaryColor} 80%, #000)` : '#764ba2'})`,
+                        color: formData.theme.yourtextColor || '#ffffff',
+                        boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
                       }}
                     >
-                      Send
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                      </svg>
                     </button>
+                  </div>
+                  <div className="text-center text-[11px] mt-2 opacity-40">
+                    Powered by AI • Press Enter to send
                   </div>
                 </div>
               </div>
@@ -505,6 +604,27 @@ export default function ThemeStep({ formData, updateFormData }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Add animation styles */}
+      <style jsx>{`
+        @keyframes pulse {
+          0%, 100% { 
+            transform: scale(1); 
+            opacity: 1;
+            box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+          }
+          50% { 
+            transform: scale(1.1); 
+            opacity: 0.8;
+            box-shadow: 0 0 0 4px rgba(74, 222, 128, 0);
+          }
+        }
+
+        @keyframes bounce {
+          0%, 80%, 100% { transform: translateY(0); }
+          40% { transform: translateY(-8px); }
+        }
+      `}</style>
     </div>
   );
 }

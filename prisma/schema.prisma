@@ -62,9 +62,6 @@ model Theme {
   primaryColor    String     @db.VarChar(50)
   secondaryColor  String     @db.VarChar(50)
   backgroundColor String     @db.VarChar(50)
-  youryourtextColor   String?     @db.VarChar(50)
-  chatyourtextColor   String?     @db.VarChar(50)
-  bottomColor     String?     @db.VarChar(50)
   fontSize        String     @db.VarChar(20)
   borderRadius    String     @db.VarChar(20)
   chatWidth       String     @db.VarChar(20)
@@ -74,6 +71,9 @@ model Theme {
   updatedAt       DateTime   @updatedAt @db.Timestamp(6)
   fontFamily      FontFamily @default(Inter)
   chatPosition    String     @db.VarChar(30)
+  bottomColor     String?    @db.VarChar(50)
+  chattextColor   String?    @db.VarChar(50)
+  yourtextColor   String?    @db.VarChar(50)
   bot             Bot        @relation(fields: [botId], references: [id], onDelete: Cascade)
 
   @@map("themes")
@@ -130,6 +130,52 @@ model BotAnalytics {
 
   @@unique([botId, date])
   @@map("bot_analytics")
+}
+
+model alembic_version {
+  version_num String @id(map: "alembic_version_pkc") @db.VarChar(32)
+}
+
+model backendusers {
+  user_id         String    @id @db.Uuid
+  username        String    @unique @db.VarChar
+  hashed_password String?   @db.VarChar
+  tenant_id       String    @db.Uuid
+  is_active       Boolean?
+  created_at      DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime? @default(now()) @db.Timestamptz(6)
+  tenants         tenants   @relation(fields: [tenant_id], references: [tenant_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([tenant_id], map: "idx_users_tenant_id")
+}
+
+model knowledge_sources {
+  source_id       String    @id @db.Uuid
+  tenant_id       String    @db.Uuid
+  source_type     String    @db.VarChar
+  source_url      String?
+  source_content  String?
+  file_name       String?   @db.VarChar
+  file_content    String?
+  status          String?   @db.VarChar
+  error_message   String?
+  source_metadata Json?
+  created_at      DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime? @default(now()) @db.Timestamptz(6)
+  tenants         tenants   @relation(fields: [tenant_id], references: [tenant_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([status], map: "idx_knowledge_sources_status")
+  @@index([tenant_id], map: "idx_knowledge_sources_tenant_id")
+}
+
+model tenants {
+  tenant_id         String              @id @db.Uuid
+  tenant_name       String              @unique @db.VarChar
+  is_active         Boolean?
+  created_at        DateTime?           @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime?           @default(now()) @db.Timestamptz(6)
+  backendusers      backendusers[]
+  knowledge_sources knowledge_sources[]
 }
 
 /// ---------- ENUMS ----------

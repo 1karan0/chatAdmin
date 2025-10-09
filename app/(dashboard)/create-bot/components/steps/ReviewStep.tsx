@@ -185,7 +185,7 @@ export default function ReviewStep({ formData }: Props) {
                   fontFamily: formData.theme.fontFamily,
                   fontSize: formData.theme.fontSize,
                   borderRadius: formData.theme.borderRadius,
-                  color: formData.theme.yourtextColor,
+                  color: formData.theme.chattextColor,
                   backgroundColor: formData.theme.primaryColor + "20",
 
                 }}

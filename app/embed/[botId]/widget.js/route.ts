@@ -128,7 +128,7 @@ export async function GET(
           <!-- Header with Gradient -->
           <div style="
             background: linear-gradient(135deg, \${theme.primaryColor || '#667eea'}, \${theme.primaryColor ? 'color-mix(in srgb, ' + theme.primaryColor + ' 80%, #000)' : '#764ba2'});
-            color: \${theme.textColor || '#ffffff'};
+            color: \${theme.yourtextColor || '#ffffff'};
             padding: 20px 24px;
             display: flex;
             align-items: center;

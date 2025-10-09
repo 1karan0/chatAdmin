@@ -18,10 +18,11 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
   const [urlInput, setUrlInput] = useState('');
   const [textInput, setTextInput] = useState('');
   const [textTitle, setTextTitle] = useState('');
-  const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
   const [dragActive, setDragActive] = useState(false);
   const { data: Session } = useSession();
   const [urlLoading, setUrlLoading] = useState(false);
+  const [textLoading, setTextLoading] = useState(false);
+  const [fileLoading, setFileLoading] = useState(false);
 
   const supportedFileTypes = [
     { type: 'pdf', label: 'PDF Documents', accept: '.pdf', mime: 'application/pdf' },
@@ -96,6 +97,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
   const addText = async () => {
     try {
       if (!textInput.trim()) return;
+      setTextLoading(true);
 
       const formdata = new FormData();
       formdata.append("text", textInput.trim());
@@ -112,13 +114,36 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
         }
       );
       if (!addText.ok) {
+        setTextLoading(false);
+        toast.error("Failed to add text content!", {
+          icon: '❌',
+          style: {
+            borderRadius: '8px',
+            background: '#450a0a',
+            color: '#fff',
+            fontWeight: 'bold',
+          },
+          duration: 5000,
+        });
         throw new Error("Failed to add text content");
       }
       const data = addText.json();
       console.log("Text content added successfully:", data);
+      setTextLoading(false);
+      toast.success("Text content added successfully!", {
+        icon: '📝',
+        style: {
+          borderRadius: '8px',
+          background: '#1e293b',
+          color: '#fff',
+          fontWeight: 'bold',
+        },
+        duration: 4000,
+      });
     }
     catch (err) {
       console.log(err);
+      setTextLoading(false);
     }
     if (!textInput.trim()) return;
 
@@ -137,6 +162,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
 
   const addFile = async (file: File) => {
     try {
+      setFileLoading(true);
       const formdata = new FormData();
       formdata.append("file", file);
       formdata.append("tenant_id", Session?.user.tenantId || "");
@@ -151,7 +177,31 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
         }
       );
       if (!upload.ok) {
+        setFileLoading(false);
+        toast.error("Failed to upload file!", {
+          icon: '❌',
+          style: {
+            borderRadius: '8px',
+            background: '#450a0a',
+            color: '#fff',
+            fontWeight: 'bold',
+          },
+          duration: 5000,
+        });
         throw new Error("Failed to upload file");
+      }
+      if(upload.ok){
+        setFileLoading(false);
+        toast.success("File uploaded successfully!", {
+          icon: '📁',
+          style: {
+            borderRadius: '8px',
+            background: '#1e293b',
+            color: '#fff',
+            fontWeight: 'bold',
+          },
+          duration: 4000,
+        });
       }
     }
     catch (err) {
@@ -161,7 +211,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
 
   const handleFileUpload = (files: FileList | null) => {
     if (!files) return;
-
+      setFileLoading(true);
     Array.from(files).forEach((file) => {
       // Validate file type
       const isSupported = supportedFileTypes.some(type =>
@@ -170,12 +220,14 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
 
       if (!isSupported) {
         toast.error(`File type not supported: ${file.name}`);
+        setFileLoading(false);
         return;
       }
 
       // Validate file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
         toast.error(`File too large: ${file.name}. Maximum size is 10MB.`);
+        setFileLoading(false);
         return;
       }
 
@@ -187,7 +239,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
 
       const newItem = {
         id: Date.now().toString() + Math.random().toString(36).substring(2),
-        type: fileType as any,
+        type: 'file' as const,
         content: file.name,
         title: file.name,
         status: 'pending' as const,
@@ -319,7 +371,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Add Text
+                {textLoading ? 'Adding...' : 'Add Text'}
               </Button>
             </div>
           </div>
@@ -363,7 +415,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Upload className="w-4 h-4 mr-2" />
-                Choose Files
+                {fileLoading ? 'Uploading...' : 'Browse Files'}
               </Button>
             </div>
 
@@ -404,7 +456,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
                     </p>
                     <p className="text-sm text-zinc-400">
                       {item.type === 'url' ? item.content :
-                        item.type === 'text' ? `${item.content.substring(0, 100)}...` :
+                        item.type === 'text' ? `${item.content.substring(0, 50)}...` :
                           `${item.type.toUpperCase()} • ${item.fileSize ? Math.round(item.fileSize / 1024) + ' KB' : ''}`}
                     </p>
                     {item.status === 'processing' && (
