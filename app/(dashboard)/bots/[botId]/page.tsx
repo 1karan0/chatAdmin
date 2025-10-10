@@ -19,6 +19,7 @@ export default function BotEditorPage() {
   const [saving, setSaving] = useState(false);
   const [deploying, setDeploying] = useState(false);
   const [activeTab, setActiveTab] = useState("settings");
+  const [deletLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     fetchBot();
@@ -79,9 +80,13 @@ export default function BotEditorPage() {
 
   const deleteBot = async () => {
     try {
+      setDeleteLoading(true);
       const response = await fetch(`/api/bots/${params.botId}`, { method: "DELETE" });
-      if (response.ok) router.push("/dashboard");
+      if (response.ok)
+        setDeleteLoading(false);
+        router.push("/dashboard");
     } catch (err) {
+      setDeleteLoading(false);
       console.error("Error deleting bot:", err);
     }
   };
@@ -119,6 +124,7 @@ export default function BotEditorPage() {
           onDeploy={deployBot}
           deploying={deploying}
           onDelete={deleteBot}
+          deleteLoading={deletLoading}
         />
 
         <BotTabs activeTab={activeTab} setActiveTab={setActiveTab} />

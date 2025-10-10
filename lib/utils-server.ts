@@ -51,9 +51,9 @@ export const authOptions: AuthOptions = {
           // Generate a unique tenant_id for the Python backend
           const tenantId = `${crypto.randomUUID()}`;
           const tenantName = `${user.name || "User"}'s tenant`;
-          const username = user.email?.split("@")[0] || "user";
+          const username = user.name || "user";
 
-          // 🔥 Call Python backend to create the tenant
+          // Call Python backend to create the tenant
           try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/tenants`, {
               method: "POST",

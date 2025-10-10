@@ -19,9 +19,9 @@ model User {
   location      String?        @db.VarChar(255)
   website       String?        @db.VarChar(500)
   workspace     String?        @db.VarChar(255)
+  tenantId      String?
   bots          Bot[]
   conversations Conversation[]
-  tenantId      String?       
 
   @@index([email])
   @@map("users")
@@ -132,10 +132,6 @@ model BotAnalytics {
   @@map("bot_analytics")
 }
 
-model alembic_version {
-  version_num String @id(map: "alembic_version_pkc") @db.VarChar(32)
-}
-
 model backendusers {
   user_id         String    @id @db.Uuid
   username        String    @unique @db.VarChar
@@ -145,8 +141,6 @@ model backendusers {
   created_at      DateTime? @default(now()) @db.Timestamptz(6)
   updated_at      DateTime? @default(now()) @db.Timestamptz(6)
   tenants         tenants   @relation(fields: [tenant_id], references: [tenant_id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([tenant_id], map: "idx_users_tenant_id")
 }
 
 model knowledge_sources {
@@ -163,9 +157,6 @@ model knowledge_sources {
   created_at      DateTime? @default(now()) @db.Timestamptz(6)
   updated_at      DateTime? @default(now()) @db.Timestamptz(6)
   tenants         tenants   @relation(fields: [tenant_id], references: [tenant_id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([status], map: "idx_knowledge_sources_status")
-  @@index([tenant_id], map: "idx_knowledge_sources_tenant_id")
 }
 
 model tenants {

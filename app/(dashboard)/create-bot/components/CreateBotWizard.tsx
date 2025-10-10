@@ -154,31 +154,6 @@ export default function CreateBotWizard() {
     // Navigate to bot page
     if (botId) router.push(`/bots/${botId}`);
 
-    // Optional: get current processing status for the bot
-    if (botId) {
-      const statusRes = await fetch(`/api/knowledge/process?botId=${botId}`, { method: "GET" });
-      const statusJson = await statusRes.json();
-      console.log("Processing status:", statusJson);
-    }
-
-    // Trigger processing for each knowledgeBase item (POST per item)
-    if (knowledgeBases.length > 0) {
-      await Promise.all(
-        knowledgeBases.map((kb:any) =>
-          fetch("/api/knowledge/process", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ botId, knowledgeBaseId: kb.id }),
-          }).then(res => {
-            if (!res.ok) throw new Error(`Failed to process KB ${kb.id}`);
-            return res.json();
-          })
-        )
-      );
-      console.log(`Triggered processing for ${knowledgeBases.length} KB items`);
-    } else {
-      console.log("No knowledgeBase items returned with bot creation.");
-    }
 
   } catch (err) {
     console.error(err);

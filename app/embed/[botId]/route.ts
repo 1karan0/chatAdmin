@@ -394,7 +394,7 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
       showTyping();
 
       try {
-        const response = await fetch('http://localhost:8000/chat/ask', {
+        const response = await fetch('https://chatbotbackend-grm3.onrender.com/chat/ask', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -409,7 +409,7 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
         else addMessage(data.detail || 'Something went wrong.');
       } catch (err) {
         hideTyping();
-        addMessage('⚠️ Network error, please try again.');
+        addMessage(' Network error, please try again.');
       }
 
       sendButton.disabled = false;
