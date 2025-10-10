@@ -20,12 +20,14 @@ interface BotCardProps {
   bot: Bot;
   onDelete: (botId: string) => void;
   onDeploy: (botId: string) => void;
+  deleteLoading?: boolean;
 }
 
 export default function BotCard({
   bot,
   onDelete,
   onDeploy,
+  deleteLoading
 }: BotCardProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -192,6 +194,7 @@ export default function BotCard({
           bot={bot}
           setShowDeleteModal={setShowDeleteModal}
           confirmDelete={confirmDelete}
+          deleteLoading={deleteLoading}
         />
       )}
     </>

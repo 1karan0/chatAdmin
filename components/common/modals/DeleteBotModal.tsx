@@ -5,9 +5,10 @@ interface Props {
     setShowDeleteModal : (value:boolean)=>void;
     confirmDelete: ()=>void;
     bot: Bot
+    deleteLoading?: boolean;
 }
 
-export default function DeleteBotModal({setShowDeleteModal ,confirmDelete,bot}:Props){
+export default function DeleteBotModal({setShowDeleteModal ,confirmDelete,bot,deleteLoading}:Props){
     return(
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
           <div className="bg-black border rounded-lg p-5 text-sm w-full max-w-sm">
@@ -29,7 +30,7 @@ export default function DeleteBotModal({setShowDeleteModal ,confirmDelete,bot}:P
                 onClick={confirmDelete}
                 className="bg-red-600 hover:bg-red-700 text-white"
               >
-                Delete
+                {deleteLoading ? "Deleting..." : "Delete"}
               </Button>
             </div>
           </div>

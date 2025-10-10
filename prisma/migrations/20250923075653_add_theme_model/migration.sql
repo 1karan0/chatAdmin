@@ -5,7 +5,7 @@ CREATE TABLE "public"."themes" (
     "primaryColor" VARCHAR(50) NOT NULL,
     "secondaryColor" VARCHAR(50) NOT NULL,
     "backgroundColor" VARCHAR(50) NOT NULL,
-    "textColor" VARCHAR(50) NOT NULL,
+    "yourtextColor" VARCHAR(50) NOT NULL,
     "fontFamily" VARCHAR(100) NOT NULL,
     "fontSize" VARCHAR(20) NOT NULL,
     "borderRadius" VARCHAR(20) NOT NULL,

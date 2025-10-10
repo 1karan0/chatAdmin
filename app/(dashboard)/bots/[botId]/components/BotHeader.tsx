@@ -13,9 +13,10 @@ interface Props {
   onDeploy: () => void;
   deploying: boolean;
   onDelete: () => void;
+  deleteLoading?: boolean;
 }
 
-export default function BotHeader({ bot, onSave, saving, onDeploy, deploying, onDelete }: Props) {
+export default function BotHeader({ bot, onSave, saving, onDeploy, deploying, onDelete,deleteLoading }: Props) {
     const [ deleteModalOpen, setDeleteModalOpen ] = useState(false);
 
 
@@ -51,6 +52,7 @@ export default function BotHeader({ bot, onSave, saving, onDeploy, deploying, on
         deleteModalOpen && <DeleteBotModal bot={bot} setShowDeleteModal={setDeleteModalOpen} confirmDelete={()=>{
             onDelete();
             setDeleteModalOpen(false);
+            deleteLoading
         }} />
               }
 

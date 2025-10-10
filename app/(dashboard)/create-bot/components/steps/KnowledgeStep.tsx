@@ -4,6 +4,9 @@ import { useState } from "react";
 import { Globe, FileText, Plus, Trash2, Upload, Link, File, AlertCircle } from "lucide-react";
 import { Button } from "@/components/common/components/Button";
 import { BotFormData } from "../CreateBotWizard";
+import { useSession } from "next-auth/react";
+import toast, { Toaster } from 'react-hot-toast';
+
 
 interface Props {
   formData: BotFormData;
@@ -15,8 +18,11 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
   const [urlInput, setUrlInput] = useState('');
   const [textInput, setTextInput] = useState('');
   const [textTitle, setTextTitle] = useState('');
-  const [uploadProgress, setUploadProgress] = useState<{[key: string]: number}>({});
   const [dragActive, setDragActive] = useState(false);
+  const { data: Session } = useSession();
+  const [urlLoading, setUrlLoading] = useState(false);
+  const [textLoading, setTextLoading] = useState(false);
+  const [fileLoading, setFileLoading] = useState(false);
 
   const supportedFileTypes = [
     { type: 'pdf', label: 'PDF Documents', accept: '.pdf', mime: 'application/pdf' },
@@ -26,22 +32,119 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
     { type: 'json', label: 'JSON Files', accept: '.json', mime: 'application/json' },
   ];
 
-  const addUrl = () => {
-    if (!urlInput.trim()) return;
+  const addUrl = async () => {
+    try {
+      if (!urlInput.trim()) return;
 
+      setUrlLoading(true);
+
+      const formData = new FormData();
+      formData.append("url", urlInput.trim());
+      formData.append("tenant_id", Session?.user.tenantId || "");
+
+      const addUrl = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/knowledge/sources/url`, {
+        method: "POST",
+        headers: {
+          "x-internal-secret": process.env.INTERNAL_API_KEY || "", // Do NOT set Content-Type for FormData!
+        },
+        body: formData,
+      });
+
+      if (!addUrl.ok) {
+        setUrlLoading(false);
+        toast.error("Failed to add URL!", {
+          icon: '❌',
+          style: {
+            borderRadius: '8px',
+            background: '#450a0a',
+            color: '#fff',
+            fontWeight: 'bold',
+          },
+          duration: 5000,
+        });
+        throw new Error("Failed to add URL");
+      }
+      const data = await addUrl.json();
+      setUrlLoading(false);
+      toast.success("URL added successfully!", {
+        icon: '🌐',
+        style: {
+          borderRadius: '8px',
+          background: '#1e293b',
+          color: '#fff',
+          fontWeight: 'bold',
+        },
+        duration: 4000,
+      });
+      console.log("URL added successfully:", data);
+
+      // Add to local state
+
+    } catch (err) {
+      setUrlLoading(false);
+      console.log(err);
+    }
     const newItem = {
       id: Date.now().toString(),
-      type: 'url' as const, 
+      type: 'url' as const,
       content: urlInput.trim(),
       status: 'pending' as const,
     };
-
-    
     updateFormData('knowledgeBase', [...formData.knowledgeBase, newItem]);
     setUrlInput('');
   };
 
-  const addText = () => {
+  const addText = async () => {
+    try {
+      if (!textInput.trim()) return;
+      setTextLoading(true);
+
+      const formdata = new FormData();
+      formdata.append("text", textInput.trim());
+      formdata.append("title", textTitle.trim() || "Text Content");
+      formdata.append("tenant_id", Session?.user.tenantId || "");
+
+      const addText = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/knowledge/sources/text`,
+        {
+          method: "POST",
+          headers: {
+            "x-internal-secret": process.env.INTERNAL_API_KEY || "", // Do NOT set Content-Type for FormData!
+          },
+          body: formdata,
+        }
+      );
+      if (!addText.ok) {
+        setTextLoading(false);
+        toast.error("Failed to add text content!", {
+          icon: '❌',
+          style: {
+            borderRadius: '8px',
+            background: '#450a0a',
+            color: '#fff',
+            fontWeight: 'bold',
+          },
+          duration: 5000,
+        });
+        throw new Error("Failed to add text content");
+      }
+      const data = addText.json();
+      console.log("Text content added successfully:", data);
+      setTextLoading(false);
+      toast.success("Text content added successfully!", {
+        icon: '📝',
+        style: {
+          borderRadius: '8px',
+          background: '#1e293b',
+          color: '#fff',
+          fontWeight: 'bold',
+        },
+        duration: 4000,
+      });
+    }
+    catch (err) {
+      console.log(err);
+      setTextLoading(false);
+    }
     if (!textInput.trim()) return;
 
     const newItem = {
@@ -57,35 +160,86 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
     setTextTitle('');
   };
 
+  const addFile = async (file: File) => {
+    try {
+      setFileLoading(true);
+      const formdata = new FormData();
+      formdata.append("file", file);
+      formdata.append("tenant_id", Session?.user.tenantId || "");
+
+      const upload = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/knowledge/sources/file`,
+        {
+          method: "POST",
+          headers: {
+            "x-internal-secret": process.env.INTERNAL_API_KEY || "", // Do NOT set Content-Type for FormData!
+          },
+          body: formdata,
+        }
+      );
+      if (!upload.ok) {
+        setFileLoading(false);
+        toast.error("Failed to upload file!", {
+          icon: '❌',
+          style: {
+            borderRadius: '8px',
+            background: '#450a0a',
+            color: '#fff',
+            fontWeight: 'bold',
+          },
+          duration: 5000,
+        });
+        throw new Error("Failed to upload file");
+      }
+      if(upload.ok){
+        setFileLoading(false);
+        toast.success("File uploaded successfully!", {
+          icon: '📁',
+          style: {
+            borderRadius: '8px',
+            background: '#1e293b',
+            color: '#fff',
+            fontWeight: 'bold',
+          },
+          duration: 4000,
+        });
+      }
+    }
+    catch (err) {
+      console.log(err);
+    }
+  }
+
   const handleFileUpload = (files: FileList | null) => {
     if (!files) return;
-
+      setFileLoading(true);
     Array.from(files).forEach((file) => {
       // Validate file type
-      const isSupported = supportedFileTypes.some(type => 
+      const isSupported = supportedFileTypes.some(type =>
         file.type === type.mime || file.name.toLowerCase().endsWith(type.accept.substring(1))
       );
 
       if (!isSupported) {
-        alert(`File type not supported: ${file.name}`);
+        toast.error(`File type not supported: ${file.name}`);
+        setFileLoading(false);
         return;
       }
 
       // Validate file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
-        alert(`File too large: ${file.name}. Maximum size is 10MB.`);
+        toast.error(`File too large: ${file.name}. Maximum size is 10MB.`);
+        setFileLoading(false);
         return;
       }
 
       const fileType = file.type.includes('pdf') ? 'pdf' :
-                      file.type.includes('word') ? 'docx' :
-                      file.type.includes('text') ? 'txt' :
-                      file.type.includes('csv') ? 'csv' :
-                      file.type.includes('json') ? 'json' : 'file';
+        file.type.includes('word') ? 'docx' :
+          file.type.includes('text') ? 'txt' :
+            file.type.includes('csv') ? 'csv' :
+              file.type.includes('json') ? 'json' : 'file';
 
       const newItem = {
         id: Date.now().toString() + Math.random().toString(36).substring(2),
-        type: fileType as any,
+        type: 'file' as const,
         content: file.name,
         title: file.name,
         status: 'pending' as const,
@@ -93,6 +247,8 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
         fileSize: file.size,
         mimeType: file.type,
       };
+      console.log("this is file ==", file)
+      addFile(file);
 
       updateFormData('knowledgeBase', [...formData.knowledgeBase, newItem]);
     });
@@ -112,7 +268,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFileUpload(e.dataTransfer.files);
     }
@@ -124,8 +280,9 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
 
   return (
     <div className="space-y-6 w-full">
+      <Toaster />
       <div className="text-center mb-8">
-      
+
         <h2 className="text-2xl font-bold text-white mb-2">Add Knowledge Sources</h2>
         <p className="text-zinc-400">Upload documents, add websites, or paste text to train your bot</p>
       </div>
@@ -133,33 +290,30 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
       {/* Tab Selection */}
       <div className="flex w-full border-b border-zinc-800 mb-6">
         <button
-          className={`flex items-center px-6 py-3 border-b-2 transition-colors ${
-            activeTab === 'url'
+          className={`flex items-center px-6 py-3 border-b-2 transition-colors ${activeTab === 'url'
               ? 'border-blue-500 text-white'
               : 'border-transparent text-zinc-400 hover:text-white'
-          }`}
+            }`}
           onClick={() => setActiveTab('url')}
         >
           <Globe className="w-4 h-4 mr-2" />
           Website URLs
         </button>
         <button
-          className={`flex items-center px-6 py-3 border-b-2 transition-colors ${
-            activeTab === 'text'
+          className={`flex items-center px-6 py-3 border-b-2 transition-colors ${activeTab === 'text'
               ? 'border-blue-500 text-white'
               : 'border-transparent text-zinc-400 hover:text-white'
-          }`}
+            }`}
           onClick={() => setActiveTab('text')}
         >
           <FileText className="w-4 h-4 mr-2" />
           Text Content
         </button>
         <button
-          className={`flex items-center px-6 py-3 border-b-2 transition-colors ${
-            activeTab === 'file'
+          className={`flex items-center px-6 py-3 border-b-2 transition-colors ${activeTab === 'file'
               ? 'border-blue-500 text-white'
               : 'border-transparent text-zinc-400 hover:text-white'
-          }`}
+            }`}
           onClick={() => setActiveTab('file')}
         >
           <Upload className="w-4 h-4 mr-2" />
@@ -186,11 +340,11 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Add URL
+                {urlLoading ? 'Adding...' : 'Add URL'}
               </Button>
             </div>
             <p className="text-sm text-zinc-500 mt-2">
-              Our Python backend will crawl and extract content from this website
+              we will crawl and extract content from this website
             </p>
           </div>
         </div>
@@ -217,7 +371,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Add Text
+                {textLoading ? 'Adding...' : 'Add Text'}
               </Button>
             </div>
           </div>
@@ -229,14 +383,13 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
         <div className="space-y-4">
           <div className="bg-zinc-800/50 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Upload Documents</h3>
-            
+
             {/* Drag and Drop Area */}
             <div
-              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                dragActive 
-                  ? 'border-blue-500 bg-blue-500/10' 
+              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive
+                  ? 'border-blue-500 bg-blue-500/10'
                   : 'border-zinc-600 hover:border-zinc-500'
-              }`}
+                }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
@@ -262,7 +415,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Upload className="w-4 h-4 mr-2" />
-                Choose Files
+                {fileLoading ? 'Uploading...' : 'Browse Files'}
               </Button>
             </div>
 
@@ -302,9 +455,9 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
                       {item.title || item.content}
                     </p>
                     <p className="text-sm text-zinc-400">
-                      {item.type === 'url' ? item.content : 
-                       item.type === 'text' ? `${item.content.substring(0, 100)}...` :
-                       `${item.type.toUpperCase()} • ${item.fileSize ? Math.round(item.fileSize / 1024) + ' KB' : ''}`}
+                      {item.type === 'url' ? item.content :
+                        item.type === 'text' ? `${item.content.substring(0, 50)}...` :
+                          `${item.type.toUpperCase()} • ${item.fileSize ? Math.round(item.fileSize / 1024) + ' KB' : ''}`}
                     </p>
                     {item.status === 'processing' && (
                       <div className="flex items-center space-x-2 mt-1">

@@ -14,6 +14,7 @@ export default function Dashboard() {
 
   // Fetch bots data
   const { data: bots, loading: botsLoading, error: botsError, refetch: refetchBots } = useApi(getBots);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const handleCreateBot = () => {
     router.push('/create-bot');
@@ -24,15 +25,20 @@ export default function Dashboard() {
     if (!bot) return;
 
     try {
+      setDeleteLoading(true);
       const res = await fetch(`/api/bots/${botId}`, {
         method: 'DELETE',
       });
       if (res.ok) {
+        setDeleteLoading(false);
         refetchBots();
       } else {
+        setDeleteLoading(false);
         alert('Failed to delete bot.');
       }
     } catch (error) {
+      setDeleteLoading(false);
+      console.error('Error deleting bot:', error);
       alert('Error deleting bot.');
     }
   };
@@ -64,6 +70,7 @@ export default function Dashboard() {
           onDeleteBot={handleDeleteBot}
           onDeployBot={handleDeployBot}
           loading={botsLoading}
+          deleteLoading={deleteLoading}
         />
       </div>
     </Layout>

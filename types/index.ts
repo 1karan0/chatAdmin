@@ -63,6 +63,7 @@ export interface User {
   avatar: string;
   workspace: string;
   emailVerified: boolean;
+  tenantId?: string | null;
 }
 
 export interface BotFormData {
@@ -85,7 +86,9 @@ export interface BotTheme {
   primaryColor: string;
   secondaryColor: string;
   backgroundColor: string;
-  textColor: string;
+  yourtextColor: string;
+  chattextColor: string;
+  bottomColor: string;
   fontFamily: string;
   fontSize: string;
   borderRadius: string;
