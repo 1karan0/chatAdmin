@@ -35,7 +35,7 @@ export async function GET(
     }
 
     const theme = bot.theme || {};
-    const tenantId = bot.user?.tenantId || '';
+    const tenantId = bot.user?.tenantsTenant_id || '';
     const botName = bot.name || 'Chat Bot';
 
     const widgetScript = `

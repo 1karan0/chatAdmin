@@ -1,11 +1,12 @@
 "use client"
 
-import { Settings, BarChart3, Code } from "lucide-react";
+import { Settings, BarChart3, Code,Library } from "lucide-react";
 
 const tabs = [
   { id: "settings", name: "Settings", icon: Settings },
   { id: "analytics", name: "Analytics", icon: BarChart3 },
   { id: "deploy", name: "Deploy", icon: Code },
+  { id: "integrations", name: "Add knowledge", icon: Library},
 ];
 
 export default function BotTabs({

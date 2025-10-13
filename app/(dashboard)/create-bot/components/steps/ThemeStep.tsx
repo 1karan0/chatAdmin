@@ -21,8 +21,6 @@ const fontFamilies = [
 const chatPositions = [
   { value: 'bottom-right', label: 'Bottom Right', icon: '↘️' },
   { value: 'bottom-left', label: 'Bottom Left', icon: '↙️' },
-  { value: 'top-right', label: 'Top Right', icon: '↗️' },
-  { value: 'top-left', label: 'Top Left', icon: '↖️' },
 ];
 
 const presetThemes = [
@@ -420,6 +418,7 @@ export default function ThemeStep({ formData, updateFormData }: Props) {
                   style={{
                     background: `linear-gradient(135deg, ${formData.theme.primaryColor || '#667eea'}, ${formData.theme.primaryColor ? `color-mix(in srgb, ${formData.theme.primaryColor} 80%, #000)` : '#764ba2'})`,
                     boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                    color: formData.theme.yourtextColor || '#ffffff',
                   }}
                 >
                   {/* Avatar */}
@@ -493,7 +492,7 @@ export default function ThemeStep({ formData, updateFormData }: Props) {
                     <div
                       className="px-4 py-3 rounded-2xl"
                       style={{
-                        background: `linear-gradient(135deg, ${formData.theme.primaryColor || '#667eea'}, ${formData.theme.primaryColor ? `color-mix(in srgb, ${formData.theme.primaryColor} 90%, #000)` : '#764ba2'})`,
+                        background:`${formData.theme.primaryColor || '#667eea'}`,
                         color: formData.theme.yourtextColor || '#ffffff',
                         fontSize: formData.theme.fontSize || '14px',
                         lineHeight: '1.5',

@@ -1,5 +1,6 @@
 export interface Bot {
   id: string;
+  tenant_id: string;
   name: string;
   status: 'DRAFT' | 'PUBLISHED' | 'DEPLOYED' | 'ARCHIVED';
   deploymentUrl?: string;

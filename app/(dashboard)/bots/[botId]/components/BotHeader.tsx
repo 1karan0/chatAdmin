@@ -1,6 +1,6 @@
 "use client"
 
-import { Save, Play, Trash2 } from "lucide-react";
+import { Save, Play, Trash2, BotMessageSquare } from "lucide-react";
 import { Button } from "@/components/common/components/Button";
 import { Bot } from "@/types";
 import DeleteBotModal from "@/components/common/modals/DeleteBotModal";
@@ -26,6 +26,7 @@ export default function BotHeader({ bot, onSave, saving, onDeploy, deploying, on
       <div className="lg:flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+            <BotMessageSquare />
           </div>
           <div>
             <h1 className="lg:text-xl font-bold text-white">{bot.name}</h1>

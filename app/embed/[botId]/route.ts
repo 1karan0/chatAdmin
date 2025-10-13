@@ -34,7 +34,7 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
 
         const theme = bot.theme || {};
         const user = bot.user;
-        const tenantId = user?.tenantId || '';
+        const tenantId = bot?.tenant_id || '';
 
         const html = `
 <!DOCTYPE html>
@@ -352,7 +352,7 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
   </div>
 
   <script>
-    const tenantId = "${tenantId}";
+    const tenantId = "${bot.tenant_id}";
     const messagesContainer = document.getElementById('messages');
     const messageInput = document.getElementById('messageInput');
     const sendButton = document.getElementById('sendButton');

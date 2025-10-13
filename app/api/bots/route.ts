@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, description, avatar, config, theme, isPublic, knowledgeBase } = body;
+    const { name, description, avatar, config, theme, isPublic, knowledgeBase,tenant_id } = body;
 
     if (!name) {
       return NextResponse.json({ error: 'Bot name is required' }, { status: 400 });
@@ -63,6 +63,7 @@ export async function POST(request: NextRequest) {
     const bot = await prisma.bot.create({
   data: {
     name,
+    tenant_id: tenant_id || null,
     description: description || '',
     avatar: avatar || '',
     isPublic: isPublic || false,

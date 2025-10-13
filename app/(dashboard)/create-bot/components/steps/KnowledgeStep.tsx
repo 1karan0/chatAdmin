@@ -20,9 +20,6 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
   const [textTitle, setTextTitle] = useState('');
   const [dragActive, setDragActive] = useState(false);
   const { data: Session } = useSession();
-  const [urlLoading, setUrlLoading] = useState(false);
-  const [textLoading, setTextLoading] = useState(false);
-  const [fileLoading, setFileLoading] = useState(false);
 
   const supportedFileTypes = [
     { type: 'pdf', label: 'PDF Documents', accept: '.pdf', mime: 'application/pdf' },
@@ -33,57 +30,6 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
   ];
 
   const addUrl = async () => {
-    try {
-      if (!urlInput.trim()) return;
-
-      setUrlLoading(true);
-
-      const formData = new FormData();
-      formData.append("url", urlInput.trim());
-      formData.append("tenant_id", Session?.user.tenantId || "");
-
-      const addUrl = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/knowledge/sources/url`, {
-        method: "POST",
-        headers: {
-          "x-internal-secret": process.env.INTERNAL_API_KEY || "", // Do NOT set Content-Type for FormData!
-        },
-        body: formData,
-      });
-
-      if (!addUrl.ok) {
-        setUrlLoading(false);
-        toast.error("Failed to add URL!", {
-          icon: '❌',
-          style: {
-            borderRadius: '8px',
-            background: '#450a0a',
-            color: '#fff',
-            fontWeight: 'bold',
-          },
-          duration: 5000,
-        });
-        throw new Error("Failed to add URL");
-      }
-      const data = await addUrl.json();
-      setUrlLoading(false);
-      toast.success("URL added successfully!", {
-        icon: '🌐',
-        style: {
-          borderRadius: '8px',
-          background: '#1e293b',
-          color: '#fff',
-          fontWeight: 'bold',
-        },
-        duration: 4000,
-      });
-      console.log("URL added successfully:", data);
-
-      // Add to local state
-
-    } catch (err) {
-      setUrlLoading(false);
-      console.log(err);
-    }
     const newItem = {
       id: Date.now().toString(),
       type: 'url' as const,
@@ -95,56 +41,6 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
   };
 
   const addText = async () => {
-    try {
-      if (!textInput.trim()) return;
-      setTextLoading(true);
-
-      const formdata = new FormData();
-      formdata.append("text", textInput.trim());
-      formdata.append("title", textTitle.trim() || "Text Content");
-      formdata.append("tenant_id", Session?.user.tenantId || "");
-
-      const addText = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/knowledge/sources/text`,
-        {
-          method: "POST",
-          headers: {
-            "x-internal-secret": process.env.INTERNAL_API_KEY || "", // Do NOT set Content-Type for FormData!
-          },
-          body: formdata,
-        }
-      );
-      if (!addText.ok) {
-        setTextLoading(false);
-        toast.error("Failed to add text content!", {
-          icon: '❌',
-          style: {
-            borderRadius: '8px',
-            background: '#450a0a',
-            color: '#fff',
-            fontWeight: 'bold',
-          },
-          duration: 5000,
-        });
-        throw new Error("Failed to add text content");
-      }
-      const data = addText.json();
-      console.log("Text content added successfully:", data);
-      setTextLoading(false);
-      toast.success("Text content added successfully!", {
-        icon: '📝',
-        style: {
-          borderRadius: '8px',
-          background: '#1e293b',
-          color: '#fff',
-          fontWeight: 'bold',
-        },
-        duration: 4000,
-      });
-    }
-    catch (err) {
-      console.log(err);
-      setTextLoading(false);
-    }
     if (!textInput.trim()) return;
 
     const newItem = {
@@ -160,58 +56,9 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
     setTextTitle('');
   };
 
-  const addFile = async (file: File) => {
-    try {
-      setFileLoading(true);
-      const formdata = new FormData();
-      formdata.append("file", file);
-      formdata.append("tenant_id", Session?.user.tenantId || "");
-
-      const upload = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/knowledge/sources/file`,
-        {
-          method: "POST",
-          headers: {
-            "x-internal-secret": process.env.INTERNAL_API_KEY || "", // Do NOT set Content-Type for FormData!
-          },
-          body: formdata,
-        }
-      );
-      if (!upload.ok) {
-        setFileLoading(false);
-        toast.error("Failed to upload file!", {
-          icon: '❌',
-          style: {
-            borderRadius: '8px',
-            background: '#450a0a',
-            color: '#fff',
-            fontWeight: 'bold',
-          },
-          duration: 5000,
-        });
-        throw new Error("Failed to upload file");
-      }
-      if(upload.ok){
-        setFileLoading(false);
-        toast.success("File uploaded successfully!", {
-          icon: '📁',
-          style: {
-            borderRadius: '8px',
-            background: '#1e293b',
-            color: '#fff',
-            fontWeight: 'bold',
-          },
-          duration: 4000,
-        });
-      }
-    }
-    catch (err) {
-      console.log(err);
-    }
-  }
 
   const handleFileUpload = (files: FileList | null) => {
     if (!files) return;
-      setFileLoading(true);
     Array.from(files).forEach((file) => {
       // Validate file type
       const isSupported = supportedFileTypes.some(type =>
@@ -220,14 +67,12 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
 
       if (!isSupported) {
         toast.error(`File type not supported: ${file.name}`);
-        setFileLoading(false);
         return;
       }
 
       // Validate file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
         toast.error(`File too large: ${file.name}. Maximum size is 10MB.`);
-        setFileLoading(false);
         return;
       }
 
@@ -248,7 +93,6 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
         mimeType: file.type,
       };
       console.log("this is file ==", file)
-      addFile(file);
 
       updateFormData('knowledgeBase', [...formData.knowledgeBase, newItem]);
     });
@@ -291,8 +135,8 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
       <div className="flex w-full border-b border-zinc-800 mb-6">
         <button
           className={`flex items-center px-6 py-3 border-b-2 transition-colors ${activeTab === 'url'
-              ? 'border-blue-500 text-white'
-              : 'border-transparent text-zinc-400 hover:text-white'
+            ? 'border-blue-500 text-white'
+            : 'border-transparent text-zinc-400 hover:text-white'
             }`}
           onClick={() => setActiveTab('url')}
         >
@@ -301,8 +145,8 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
         </button>
         <button
           className={`flex items-center px-6 py-3 border-b-2 transition-colors ${activeTab === 'text'
-              ? 'border-blue-500 text-white'
-              : 'border-transparent text-zinc-400 hover:text-white'
+            ? 'border-blue-500 text-white'
+            : 'border-transparent text-zinc-400 hover:text-white'
             }`}
           onClick={() => setActiveTab('text')}
         >
@@ -311,8 +155,8 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
         </button>
         <button
           className={`flex items-center px-6 py-3 border-b-2 transition-colors ${activeTab === 'file'
-              ? 'border-blue-500 text-white'
-              : 'border-transparent text-zinc-400 hover:text-white'
+            ? 'border-blue-500 text-white'
+            : 'border-transparent text-zinc-400 hover:text-white'
             }`}
           onClick={() => setActiveTab('file')}
         >
@@ -340,7 +184,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                {urlLoading ? 'Adding...' : 'Add URL'}
+                Add URL
               </Button>
             </div>
             <p className="text-sm text-zinc-500 mt-2">
@@ -371,7 +215,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                {textLoading ? 'Adding...' : 'Add Text'}
+                Add Text
               </Button>
             </div>
           </div>
@@ -387,8 +231,8 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
             {/* Drag and Drop Area */}
             <div
               className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive
-                  ? 'border-blue-500 bg-blue-500/10'
-                  : 'border-zinc-600 hover:border-zinc-500'
+                ? 'border-blue-500 bg-blue-500/10'
+                : 'border-zinc-600 hover:border-zinc-500'
                 }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
@@ -415,7 +259,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Upload className="w-4 h-4 mr-2" />
-                {fileLoading ? 'Uploading...' : 'Browse Files'}
+                Browse Files
               </Button>
             </div>
 

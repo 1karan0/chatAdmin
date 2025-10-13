@@ -9,6 +9,7 @@ import SettingsTab from "./components/SettingsTab";
 import AnalyticsTab from "./components/AnalyticsTab";
 import DeployTab from "./components/DeployTab";
 import { Bot } from "@/types";
+import Addknowledge from "./components/AddKnowledge";
 
 export default function BotEditorPage() {
   const params = useParams();
@@ -20,6 +21,8 @@ export default function BotEditorPage() {
   const [deploying, setDeploying] = useState(false);
   const [activeTab, setActiveTab] = useState("settings");
   const [deletLoading, setDeleteLoading] = useState(false);
+
+  const backendBase = process.env.NEXT_PUBLIC_BACKEND_BASE || "http://localhost:8000";
 
   useEffect(() => {
     fetchBot();
@@ -83,6 +86,7 @@ export default function BotEditorPage() {
       setDeleteLoading(true);
       const response = await fetch(`/api/bots/${params.botId}`, { method: "DELETE" });
       if (response.ok)
+         await fetch(`${backendBase}/auth/tenants/${bot?.tenant_id}`, { method: "DELETE" });
         setDeleteLoading(false);
         router.push("/dashboard");
     } catch (err) {
@@ -133,6 +137,7 @@ export default function BotEditorPage() {
           {activeTab === "settings" && <SettingsTab bot={bot} setBot={setBot} />}
           {activeTab === "analytics" && <AnalyticsTab bot={bot} />}
           {activeTab === "deploy" && <DeployTab bot={bot} />}
+          {activeTab === "integrations" && <Addknowledge bot = {bot}/>}
         </div>
       </div>
     </Layout>
