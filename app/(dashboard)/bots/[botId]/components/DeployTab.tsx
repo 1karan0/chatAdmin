@@ -12,9 +12,8 @@ export default function DeployTab({ bot }: { bot: Bot }) {
           <h3 className="text-lg font-semibold text-white mb-4">Deployment Status</h3>
           <div className="flex items-center space-x-3 mb-4">
             <div
-              className={`w-3 h-3 rounded-full ${
-                bot.status === "DEPLOYED" ? "bg-green-500" : "bg-zinc-500"
-              }`}
+              className={`w-3 h-3 rounded-full ${bot.status === "DEPLOYED" ? "bg-green-500" : "bg-zinc-500"
+                }`}
             ></div>
             <span className="text-white font-medium">
               {bot.status === "DEPLOYED" ? "Deployed" : "Not Deployed"}
@@ -39,15 +38,19 @@ export default function DeployTab({ bot }: { bot: Bot }) {
         </div>
 
         {/* Embed Code */}
-        <div className="bg-black border rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Embed Code</h3>
-          <p className="text-zinc-400 mb-4">Copy this code to embed the chat widget on your website:</p>
-          <div className="bg-zinc-900 rounded-lg p-4">
-            <code className="text-green-400 text-sm">
-              {`<script src="${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/embed/${bot.id}/widget.js"></script>`}
-            </code>
+        {bot.deploymentUrl && (
+          <div className="bg-black border rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Embed Code</h3>
+            <p className="text-zinc-400 mb-4">Copy this code to embed the chat widget on your website:</p>
+            <div className="bg-zinc-900 rounded-lg p-4">
+              <code className="text-green-400 text-sm">
+                {`<script src="${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/embed/${bot.id}/widget.js"></script>`}
+              </code>
+            </div>
           </div>
-        </div>
+        )
+
+        }
 
         {/* API Key */}
         <div className="bg-zinc-800 rounded-lg p-6">

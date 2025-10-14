@@ -2,7 +2,7 @@
 
 import { Palette, Monitor, Smartphone, Eye, Settings, Sparkles, Brush, Type, Layout, Code } from "lucide-react";
 import { BotFormData } from "../CreateBotWizard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   formData: BotFormData;
@@ -252,8 +252,8 @@ export default function ThemeStep({ formData, updateFormData }: Props) {
                       {fontFamilies.map((font) => (
                         <button
                           key={font.value}
-                          onClick={() => updateTheme('fontFamily', font.value)}
-                          className={`p-3 rounded-lg border transition-all ${formData.theme.fontFamily === font.value
+                          onClick={() => updateTheme('FontFamily', font.value)}
+                          className={`p-3 rounded-lg border transition-all ${formData.theme.FontFamily === font.value
                               ? 'border-blue-500 bg-blue-500/10 text-blue-300'
                               : 'border-zinc-600 hover:border-zinc-500 text-zinc-300'
                             }`}
@@ -371,26 +371,6 @@ export default function ThemeStep({ formData, updateFormData }: Props) {
                 <Eye className="w-5 h-5 mr-2 text-blue-400" />
                 Live Preview
               </h3>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setPreviewMode('desktop')}
-                  className={`p-2 rounded-lg transition-all ${previewMode === 'desktop'
-                      ? 'bg-blue-500/20 text-blue-400'
-                      : 'text-zinc-400 hover:text-white'
-                    }`}
-                >
-                  <Monitor className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setPreviewMode('mobile')}
-                  className={`p-2 rounded-lg transition-all ${previewMode === 'mobile'
-                      ? 'bg-blue-500/20 text-blue-400'
-                      : 'text-zinc-400 hover:text-white'
-                    }`}
-                >
-                  <Smartphone className="w-4 h-4" />
-                </button>
-              </div>
             </div>
 
             <div className={`bg-zinc-900/50 rounded-xl p-6 flex items-center justify-center`}
@@ -406,7 +386,7 @@ export default function ThemeStep({ formData, updateFormData }: Props) {
                   width: previewMode === 'mobile' ? '320px' : formData.theme.chatWidth || '380px',
                   height: previewMode === 'mobile' ? '500px' : formData.theme.chatHeight || '600px',
                   backgroundColor: formData.theme.backgroundColor || '#ffffff',
-                  fontFamily: formData.theme.fontFamily || 'Inter',
+                  fontFamily: formData.theme.FontFamily || 'Inter',
                   borderRadius: formData.theme.borderRadius || '16px',
                   minWidth: '350px',
                   maxWidth: '100%',
@@ -420,7 +400,7 @@ export default function ThemeStep({ formData, updateFormData }: Props) {
                     boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
                     color: formData.theme.yourtextColor || '#ffffff',
                   }}
-                >
+                > 
                   {/* Avatar */}
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-base backdrop-blur-sm"

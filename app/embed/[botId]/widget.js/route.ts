@@ -35,7 +35,7 @@ export async function GET(
     }
 
     const theme = bot.theme || {};
-    const tenantId = bot.user?.tenantsTenant_id || '';
+    const tenantId = bot.tenant_id || '';
     const botName = bot.name || 'Chat Bot';
 
     const widgetScript = `
@@ -61,7 +61,7 @@ export async function GET(
         bottom: 20px;
         \${position}
         z-index: 999999;
-        font-family: \${theme.fontFamily || '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'};
+        font-family: \${theme.FontFamily || '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'};
       ">
         <!-- Chat Toggle Button with Notification Badge -->
         <div id="bp-chat-button-wrapper" style="position: relative;">
@@ -538,7 +538,7 @@ export async function GET(
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
     try {
-      const response = await fetch('https://chatbotbackend-grm3.onrender.com/chat/ask', {
+      const response = await fetch('http://localhost:8000/chat/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: message, tenant_id: tenantId }),

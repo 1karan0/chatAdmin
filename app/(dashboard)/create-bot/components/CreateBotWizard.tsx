@@ -44,7 +44,7 @@ export interface BotFormData {
     yourtextColor: string;
     chattextColor: string;
     bottomColor: string;
-    fontFamily: string;
+    FontFamily: string;
     fontSize: string;
     borderRadius: string;
     chatPosition: "bottom-right" | "bottom-left" | "top-right" | "top-left";
@@ -70,7 +70,7 @@ const initialFormData: BotFormData = {
     yourtextColor: "#1e293b",
     chattextColor: "#1e293b",
     bottomColor: "#0ea5e9",
-    fontFamily: "Inter",
+    FontFamily: "Inter",
     fontSize: "14px",
     borderRadius: "8px",
     chatPosition: "bottom-right",
