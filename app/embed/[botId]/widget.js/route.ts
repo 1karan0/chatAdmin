@@ -194,7 +194,7 @@ export async function GET(
             scroll-behavior: smooth;
             background: \${theme.backgroundColor || '#f8f9fa'};
           ">
-            <!-- Welcome message will be added here -->
+            <!-- Messages will be added here -->
           </div>
 
           <!-- Input Area with Enhanced Design -->
@@ -280,14 +280,28 @@ export async function GET(
           animation: bp-ripple-effect 0.6s ease-out;
         }
 
-        .bp-message {
+        .bp-message-wrapper {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
           max-width: 75%;
+          animation: bp-slide-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .bp-message-wrapper.user {
+          align-self: flex-end;
+        }
+
+        .bp-message-wrapper.bot {
+          align-self: flex-start;
+        }
+
+        .bp-message {
           padding: 12px 16px;
           border-radius: 16px;
           word-wrap: break-word;
           font-size: \${theme.fontSize || '14px'};
           line-height: 1.5;
-          animation: bp-slide-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
           position: relative;
           box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
@@ -295,7 +309,6 @@ export async function GET(
         .bp-user-message {
           background: linear-gradient(135deg, \${theme.primaryColor || '#667eea'}, \${theme.primaryColor ? 'color-mix(in srgb, ' + theme.primaryColor + ' 90%, #000)' : '#764ba2'});
           color: \${theme.yourtextColor || '#ffffff'};
-          align-self: flex-end;
           border-bottom-right-radius: 4px;
           box-shadow: 0 2px 12px rgba(102, 126, 234, 0.2);
         }
@@ -303,9 +316,34 @@ export async function GET(
         .bp-bot-message {
           background: \${theme.secondaryColor || '#ffffff'};
           color: \${theme.chattextColor || '#1a1a1a'};
-          align-self: flex-start;
           border-bottom-left-radius: 4px;
           border: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .bp-suggestions-container {
+          display: flex;
+          gap: 6px;
+          flex-wrap: wrap;
+          margin-top: 4px;
+        }
+
+        .bp-suggestion-btn {
+          background: \${theme.secondaryColor || '#eef2ff'};
+          color: \${theme.primaryColor || '#4f46e5'};
+          padding: 8px 14px;
+          border-radius: 16px;
+          font-size: 13px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          border: 1px solid rgba(0,0,0,0.06);
+          font-weight: 500;
+        }
+
+        .bp-suggestion-btn:hover {
+          background: \${theme.primaryColor || '#4f46e5'};
+          color: \${theme.yourtextColor || '#ffffff'};
+          transform: translateY(-1px);
+          box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
         }
 
         .typing-indicator {
@@ -318,6 +356,9 @@ export async function GET(
           height: 40px;
           justify-content: center;
           border: 1px solid rgba(0,0,0,0.06);
+          padding: 12px 16px;
+          border-radius: 16px;
+          border-bottom-left-radius: 4px;
         }
 
         .typing-indicator .dot {
@@ -419,7 +460,7 @@ export async function GET(
 
     chatButton.addEventListener('click', toggleChat);
     minimizeBtn.addEventListener('click', closeChat);
-    sendBtn.addEventListener('click', sendMessage);
+    sendBtn.addEventListener('click', () => sendMessage());
     
     input.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' && !e.shiftKey) {
@@ -430,20 +471,17 @@ export async function GET(
 
     input.addEventListener('input', autoResize);
 
-    // Add welcome message with delay
-    setTimeout(() => {
-      addMessage(config.welcomeMessage || 'Hey! How can I help you today?', false, true);
-      if (!hasInteracted) {
-        showNotificationBadge();
-      }
-    }, 800);
-
     // Add ripple effect on button click
     chatButton.addEventListener('click', function() {
       const ripple = this.querySelector('.bp-ripple');
       ripple.classList.add('active');
       setTimeout(() => ripple.classList.remove('active'), 600);
     });
+
+    // Automatically send "hi" when widget loads
+    setTimeout(() => {
+      sendMessage('hi');
+    }, 800);
   }
 
   function autoResize() {
@@ -506,23 +544,45 @@ export async function GET(
     isOpen = false;
   }
 
-  function addMessage(text, isUser = false, isWelcome = false) {
+  function addMessage(text, isUser = false, suggestions = []) {
     const messagesContainer = document.getElementById('bp-messages');
+    
+    const wrapperDiv = document.createElement('div');
+    wrapperDiv.className = 'bp-message-wrapper ' + (isUser ? 'user' : 'bot');
+    
     const messageDiv = document.createElement('div');
-    messageDiv.className = \`bp-message \${isUser ? 'bp-user-message' : 'bp-bot-message'}\`;
+    messageDiv.className = 'bp-message ' + (isUser ? 'bp-user-message' : 'bp-bot-message');
     messageDiv.textContent = text;
-    messagesContainer.appendChild(messageDiv);
+    wrapperDiv.appendChild(messageDiv);
+
+    // Add suggestions only for bot messages
+    if (!isUser && suggestions && suggestions.length > 0) {
+      const suggestionsDiv = document.createElement('div');
+      suggestionsDiv.className = 'bp-suggestions-container';
+      
+      suggestions.forEach((sugg) => {
+        const btn = document.createElement('div');
+        btn.className = 'bp-suggestion-btn';
+        btn.textContent = sugg;
+        btn.onclick = () => sendMessage(sugg);
+        suggestionsDiv.appendChild(btn);
+      });
+      
+      wrapperDiv.appendChild(suggestionsDiv);
+    }
+
+    messagesContainer.appendChild(wrapperDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-    if (!isUser && !isWelcome && !hasInteracted) {
+    if (!isUser && !hasInteracted) {
       showNotificationBadge();
     }
   }
 
-  async function sendMessage() {
+  async function sendMessage(text = null) {
     const input = document.getElementById('bp-message-input');
     const sendBtn = document.getElementById('bp-send-button');
-    const message = input.value.trim();
+    const message = text || input.value.trim();
     if (!message) return;
 
     input.value = '';
@@ -532,7 +592,7 @@ export async function GET(
 
     const messagesContainer = document.getElementById('bp-messages');
     const typingDiv = document.createElement('div');
-    typingDiv.className = 'bp-message typing-indicator';
+    typingDiv.className = 'typing-indicator';
     typingDiv.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
     messagesContainer.appendChild(typingDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -546,7 +606,12 @@ export async function GET(
 
       const data = await response.json();
       typingDiv.remove();
-      addMessage(data.answer || data.detail || 'No response received.', false);
+      
+      if (data.answer) {
+        addMessage(data.answer, false, data.suggestions || []);
+      } else {
+        addMessage(data.detail || 'No response received.', false);
+      }
     } catch (error) {
       typingDiv.remove();
       addMessage('Sorry, something went wrong. Please try again.', false);

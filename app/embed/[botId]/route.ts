@@ -2,41 +2,41 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 interface EmbedRouteContext {
-    params: Promise<{ botId: string }>;
+  params: Promise<{ botId: string }>;
 }
 
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest, context: EmbedRouteContext) {
-    const { botId } = await context.params;
-    try {
-        const bot = await prisma.bot.findUnique({
-            where: { id: botId },
-            include: {
-                theme: true,
-                knowledgeBase: true,
-                user: true,
-            },
-        });
+  const { botId } = await context.params;
+  try {
+    const bot = await prisma.bot.findUnique({
+      where: { id: botId },
+      include: {
+        theme: true,
+        knowledgeBase: true,
+        user: true,
+      },
+    });
 
-        if (!bot || bot.status !== 'DEPLOYED') {
-            return new NextResponse('Bot not found or not deployed', { status: 404 });
-        }
+    if (!bot || bot.status !== 'DEPLOYED') {
+      return new NextResponse('Bot not found or not deployed', { status: 404 });
+    }
 
-        let config: any = bot.config || {};
-        if (typeof config === 'string') {
-            try {
-                config = JSON.parse(config);
-            } catch {
-                config = {};
-            }
-        }
+    let config: any = bot.config || {};
+    if (typeof config === 'string') {
+      try {
+        config = JSON.parse(config);
+      } catch {
+        config = {};
+      }
+    }
 
-        const theme = bot.theme || {};
-        const user = bot.user;
-        const tenantId = bot?.tenant_id || '';
+    const theme = bot.theme || {};
+    const user = bot.user;
+    const tenantId = bot?.tenant_id || '';
 
-        const html = `
+    const html = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -143,16 +143,20 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
       scroll-behavior: smooth;
     }
 
-    .message {
+    .message-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
       max-width: 75%;
-      padding: 12px 16px;
-      border-radius: 16px;
-      font-size: ${bot?.theme?.fontSize || '14px'};
-      line-height: 1.5;
-      word-wrap: break-word;
       animation: slide-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-      position: relative;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .message-wrapper.user {
+      align-self: flex-end;
+    }
+
+    .message-wrapper.bot {
+      align-self: flex-start;
     }
 
     @keyframes slide-in {
@@ -160,10 +164,19 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
+    .message {
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: ${bot?.theme?.fontSize || '14px'};
+      line-height: 1.5;
+      word-wrap: break-word;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
     .message.bot {
       background: ${bot?.theme?.secondaryColor || '#ffffff'};
       color: ${bot?.theme?.chattextColor || '#1a1a1a'};
-      align-self: flex-start;
       border-bottom-left-radius: 4px;
       border: 1px solid rgba(0,0,0,0.06);
     }
@@ -171,9 +184,34 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
     .message.user {
       background: linear-gradient(135deg, ${bot?.theme?.primaryColor || '#667eea'}, ${bot?.theme?.primaryColor ? 'color-mix(in srgb, ' + bot?.theme?.primaryColor + ' 90%, #000)' : '#764ba2'});
       color: ${bot?.theme?.yourtextColor || '#ffffff'};
-      align-self: flex-end;
       border-bottom-right-radius: 4px;
       box-shadow: 0 2px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .suggestions-container {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .suggestion-btn {
+      background: ${bot?.theme?.secondaryColor || '#eef2ff'};
+      color: ${bot?.theme?.primaryColor || '#4f46e5'};
+      padding: 8px 14px;
+      border-radius: 16px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(0,0,0,0.06);
+      font-weight: 500;
+    }
+
+    .suggestion-btn:hover {
+      background: ${bot?.theme?.primaryColor || '#4f46e5'};
+      color: ${bot?.theme?.yourtextColor || '#ffffff'};
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
     }
 
     .chat-input {
@@ -329,7 +367,6 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
     </div>
 
     <div class="chat-messages" id="messages">
-      <div class="message bot">${config.welcomeMessage || 'Hey! How can I help you today?'}</div>
     </div>
 
     <div class="typing-indicator" id="typing">
@@ -366,11 +403,32 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
       this.style.height = Math.min(this.scrollHeight, 120) + 'px';
     });
 
-    function addMessage(text, isUser = false) {
+    function addMessage(text, isUser = false, suggestions = []) {
+      const wrapperDiv = document.createElement('div');
+      wrapperDiv.className = 'message-wrapper ' + (isUser ? 'user' : 'bot');
+      
       const messageDiv = document.createElement('div');
       messageDiv.className = 'message ' + (isUser ? 'user' : 'bot');
       messageDiv.textContent = text;
-      messagesContainer.appendChild(messageDiv);
+      wrapperDiv.appendChild(messageDiv);
+
+      // Add suggestions only for bot messages
+      if (!isUser && suggestions && suggestions.length > 0) {
+        const suggestionsDiv = document.createElement('div');
+        suggestionsDiv.className = 'suggestions-container';
+        
+        suggestions.forEach((sugg) => {
+          const btn = document.createElement('div');
+          btn.className = 'suggestion-btn';
+          btn.textContent = sugg;
+          btn.onclick = () => sendMessage(sugg);
+          suggestionsDiv.appendChild(btn);
+        });
+        
+        wrapperDiv.appendChild(suggestionsDiv);
+      }
+
+      messagesContainer.appendChild(wrapperDiv);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
@@ -405,11 +463,16 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
 
         const data = await response.json();
         hideTyping();
-        if (data.answer) addMessage(data.answer);
-        else addMessage(data.detail || 'Something went wrong.');
+        
+        if (data.answer) {
+          addMessage(data.answer, false, data.suggestions || []);
+        } else {
+          addMessage(data.detail || 'Something went wrong.', false);
+        }
+
       } catch (err) {
         hideTyping();
-        addMessage(' Network error, please try again.');
+        addMessage('Network error, please try again.', false);
       }
 
       sendButton.disabled = false;
@@ -423,13 +486,20 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
         sendMessage();
       }
     });
+
+    // Automatically send "hi" when chat loads
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        sendMessage('hi');
+      }, 500);
+    });
   </script>
 </body>
 </html>`;
 
-        return new NextResponse(html, { headers: { 'Content-Type': 'text/html' } });
-    } catch (err) {
-        console.error('Error serving bot embed:', err);
-        return new NextResponse('Internal server error', { status: 500 });
-    }
+    return new NextResponse(html, { headers: { 'Content-Type': 'text/html' } });
+  } catch (err) {
+    console.error('Error serving bot embed:', err);
+    return new NextResponse('Internal server error', { status: 500 });
+  }
 }
