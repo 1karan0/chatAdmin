@@ -126,7 +126,7 @@ export default function ReviewStep({ formData }: Props) {
             </div>
             <div>
               <label className="text-sm text-zinc-400">Font Family</label>
-              <p className="text-white font-medium">{formData.theme.fontFamily}</p>
+              <p className="text-white font-medium">{formData.theme.FontFamily}</p>
             </div>
             <div>
               <label className="text-sm text-zinc-400">Chat Position</label>
@@ -182,7 +182,7 @@ export default function ReviewStep({ formData }: Props) {
               <div 
                 className="bg-zinc-100 rounded-lg p-3"
                 style={{ 
-                  fontFamily: formData.theme.fontFamily,
+                  fontFamily: formData.theme.FontFamily,
                   fontSize: formData.theme.fontSize,
                   borderRadius: formData.theme.borderRadius,
                   color: formData.theme.chattextColor,
