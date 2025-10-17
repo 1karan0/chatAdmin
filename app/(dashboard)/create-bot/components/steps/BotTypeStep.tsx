@@ -2,11 +2,13 @@
 
 import { Bot, MessageSquare, ShoppingCart, HeadphonesIcon, Users, Briefcase, Zap } from "lucide-react";
 import { BotFormData } from "../CreateBotWizard";
+import { useSession } from "next-auth/react";
 
 interface Props {
   formData: BotFormData;
   updateFormData: (field: keyof BotFormData, value: any) => void;
 }
+
 
 const botTypes = [
   {
@@ -21,29 +23,31 @@ const botTypes = [
     name: "Lead Generation",
     description: "Capture and qualify potential customers",
     icon: Users,
-  
+
   },
   {
     id: "knowledge-base",
     name: "Knowledge Base",
     description: "Provide information from your documentation",
     icon: MessageSquare,
- 
+
   },
   {
     id: "other",
     name: "other",
     description: "Define a custom behavior",
     icon: Zap,
-  
+
   }
 ];
 
+
 export default function BotTypeStep({ formData, updateFormData }: Props) {
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
-       
+
         <h2 className="text-2xl font-bold text-white mb-2">Choose Your Bot Type</h2>
         <p className="text-zinc-400">Select the type of bot that best fits your needs</p>
       </div>
@@ -55,17 +59,15 @@ export default function BotTypeStep({ formData, updateFormData }: Props) {
             <div
               key={botType.id}
               onClick={() => updateFormData("botType", botType.id)}
-              className={`p-3  border rounded-lg cursor-pointer transition-all group hover:bg-zinc-800 transition-all duration-300 ${
-                formData.botType === botType.id
-                  ? "border-blue-500 bg-blue-500/10 transition-all duration-300"
-                  : "border-zinc-600 group-hover:bg-zinc-500 transition-all duration-300"
-              }`}
+              className={`p-3  border rounded-lg cursor-pointer transition-all group hover:bg-zinc-800 transition-all duration-300 ${formData.botType === botType.id
+                ? "border-blue-500 bg-blue-500/10 transition-all duration-300"
+                : "border-zinc-600 group-hover:bg-zinc-500 transition-all duration-300"
+                }`}
             >
               <div className="flex items-center space-x-4">
-                <div className={`p-3 rounded-lg  ${
-                  formData.botType === botType.id ? "bg-blue-600" : "bg-zinc-700 group-hover:bg-blue-200 transition-all duration-300"
-                }`}>
-                  <IconComponent className={`w-5 h-5 ${formData.botType === botType.id?"text-white":"group-hover:text-blue-500"}  transition-all duration-300`} />
+                <div className={`p-3 rounded-lg  ${formData.botType === botType.id ? "bg-blue-600" : "bg-zinc-700 group-hover:bg-blue-200 transition-all duration-300"
+                  }`}>
+                  <IconComponent className={`w-5 h-5 ${formData.botType === botType.id ? "text-white" : "group-hover:text-blue-500"}  transition-all duration-300`} />
                 </div>
                 <div className="">
                   <h3 className="text-white font-semibold mb-2 group-hover:text-blue-500 transition-all duration-300">{botType.name}</h3>

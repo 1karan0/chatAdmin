@@ -38,56 +38,83 @@ export const authOptions: AuthOptions = {
 
     ],
 
-    callbacks: {
-        /**
-         * Runs on login → ensures user exists, stores userId in token
-         */
-        async jwt({ token, user }) {
-            if (user?.email) {
-                let dbUser = await prisma.user.findUnique({
-                    where: { email: user.email },
-                });
+     callbacks: {
+    async jwt({ token, user }) {
+      if (user?.email) {
+        let dbUser = await prisma.user.findUnique({
+          where: { email: user.email },
+        });
 
-                if (!dbUser) {
-                    dbUser = await prisma.user.create({
-                        data: {
-                            email: user.email,
-                            name: user.name || 'Unknown',
-                            image: user.image,
-                            workspace: `${user.name}'s Workspace`,
-                            bio: '',
-                        },
-                    });
-                }
+        // If user doesn't exist, create one
+        if (!dbUser) {
+          // Generate a unique tenant_id for the Python backend
+          const tenantId = `${crypto.randomUUID()}`;
+          const tenantName = `${user.name || "User"}'s tenant`;
+          const username = user.name || "user";
 
-                token.userId = dbUser.id;
+          // Call Python backend to create the tenant
+          try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/tenants`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-internal-secret": process.env.INTERNAL_API_KEY || "", // optional for backend auth
+              },
+              body: JSON.stringify({
+                tenant_id: tenantId,
+                tenant_name: tenantName,
+                username: username,
+              }),
+            });
+
+            if (!res.ok) {
+              const err = await res.json();
+              console.error("Failed to create tenant in backend:", err);
+            } else {
+              console.log("Tenant created successfully in backend");
             }
-            return token;
-        },
+          } catch (error) {
+            console.error("Tenant creation failed:", error);
+          }
 
-        /**
-         * Runs on every session check → pulls active subscription + usage
-         */
-        async session({ session, token }) {
-            if (token.userId) {
-                const dbUser = await prisma.user.findUnique({
-                    where: { id: token.userId },
+          // Store tenant_id in your Next.js DB user table
+          dbUser = await prisma.user.create({
+            data: {
+              email: user.email,
+              name: user.name || "Unknown",
+              image: user.image,
+              workspace: `${user.name || "User"}'s workspace`,
+              bio: "",
+            
+            },
+          });
+        }
 
-                });
+        token.userId = dbUser.id;
+      }
 
-                if (dbUser) {
-                    session.user = {
-                        id: dbUser.id,
-                        email: dbUser.email,
-                        name: dbUser.name,
-                        image: dbUser.image,
-                        workspace : dbUser.workspace,
-                        bio: dbUser.bio,
-
-                    };
-                }
-            }
-            return session;
-        },
+      return token;
     },
+
+    async session({ session, token }) {
+      if (token.userId) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.userId },
+        });
+
+        if (dbUser) {
+          session.user = {
+            id: dbUser.id,
+            email: dbUser.email,
+            name: dbUser.name,
+            image: dbUser.image,
+            workspace: dbUser.workspace,
+            bio: dbUser.bio,
+           
+          };
+        }
+      }
+      return session;
+    },
+  },
 };

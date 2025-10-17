@@ -38,41 +38,6 @@ export default function SettingsTab({
           </div>
         </div>
 
-        {/* Messages */}
-        <div className="bg-black border rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Messages</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-2">Welcome Message</label>
-              <input
-                type="text"
-                value={bot.config?.welcomeMessage || ""}
-                onChange={(e) =>
-                  setBot({
-                    ...bot,
-                    config: { ...bot.config, welcomeMessage: e.target.value },
-                  })
-                }
-                className="w-full px-3 py-2 bg-black border border-zinc-600 rounded-md text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-2">Fallback Message</label>
-              <input
-                type="text"
-                value={bot.config?.fallbackMessage || ""}
-                onChange={(e) =>
-                  setBot({
-                    ...bot,
-                    config: { ...bot.config, fallbackMessage: e.target.value },
-                  })
-                }
-                className="w-full px-3 py-2 bg-black border border-zinc-600 rounded-md text-white"
-              />
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
   );

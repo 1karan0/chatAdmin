@@ -4,6 +4,9 @@ import { useState } from "react";
 import { Globe, FileText, Plus, Trash2, Upload, Link, File, AlertCircle } from "lucide-react";
 import { Button } from "@/components/common/components/Button";
 import { BotFormData } from "../CreateBotWizard";
+import { useSession } from "next-auth/react";
+import toast, { Toaster } from 'react-hot-toast';
+
 
 interface Props {
   formData: BotFormData;
@@ -15,8 +18,8 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
   const [urlInput, setUrlInput] = useState('');
   const [textInput, setTextInput] = useState('');
   const [textTitle, setTextTitle] = useState('');
-  const [uploadProgress, setUploadProgress] = useState<{[key: string]: number}>({});
   const [dragActive, setDragActive] = useState(false);
+  const { data: Session } = useSession();
 
   const supportedFileTypes = [
     { type: 'pdf', label: 'PDF Documents', accept: '.pdf', mime: 'application/pdf' },
@@ -26,22 +29,18 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
     { type: 'json', label: 'JSON Files', accept: '.json', mime: 'application/json' },
   ];
 
-  const addUrl = () => {
-    if (!urlInput.trim()) return;
-
+  const addUrl = async () => {
     const newItem = {
       id: Date.now().toString(),
-      type: 'url' as const, 
+      type: 'url' as const,
       content: urlInput.trim(),
       status: 'pending' as const,
     };
-
-    
     updateFormData('knowledgeBase', [...formData.knowledgeBase, newItem]);
     setUrlInput('');
   };
 
-  const addText = () => {
+  const addText = async () => {
     if (!textInput.trim()) return;
 
     const newItem = {
@@ -57,35 +56,35 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
     setTextTitle('');
   };
 
+
   const handleFileUpload = (files: FileList | null) => {
     if (!files) return;
-
     Array.from(files).forEach((file) => {
       // Validate file type
-      const isSupported = supportedFileTypes.some(type => 
+      const isSupported = supportedFileTypes.some(type =>
         file.type === type.mime || file.name.toLowerCase().endsWith(type.accept.substring(1))
       );
 
       if (!isSupported) {
-        alert(`File type not supported: ${file.name}`);
+        toast.error(`File type not supported: ${file.name}`);
         return;
       }
 
       // Validate file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
-        alert(`File too large: ${file.name}. Maximum size is 10MB.`);
+        toast.error(`File too large: ${file.name}. Maximum size is 10MB.`);
         return;
       }
 
       const fileType = file.type.includes('pdf') ? 'pdf' :
-                      file.type.includes('word') ? 'docx' :
-                      file.type.includes('text') ? 'txt' :
-                      file.type.includes('csv') ? 'csv' :
-                      file.type.includes('json') ? 'json' : 'file';
+        file.type.includes('word') ? 'docx' :
+          file.type.includes('text') ? 'txt' :
+            file.type.includes('csv') ? 'csv' :
+              file.type.includes('json') ? 'json' : 'file';
 
       const newItem = {
         id: Date.now().toString() + Math.random().toString(36).substring(2),
-        type: fileType as any,
+        type: 'file' as const,
         content: file.name,
         title: file.name,
         status: 'pending' as const,
@@ -93,6 +92,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
         fileSize: file.size,
         mimeType: file.type,
       };
+      console.log("this is file ==", file)
 
       updateFormData('knowledgeBase', [...formData.knowledgeBase, newItem]);
     });
@@ -112,7 +112,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFileUpload(e.dataTransfer.files);
     }
@@ -124,8 +124,9 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
 
   return (
     <div className="space-y-6 w-full">
+      <Toaster />
       <div className="text-center mb-8">
-      
+
         <h2 className="text-2xl font-bold text-white mb-2">Add Knowledge Sources</h2>
         <p className="text-zinc-400">Upload documents, add websites, or paste text to train your bot</p>
       </div>
@@ -133,33 +134,30 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
       {/* Tab Selection */}
       <div className="flex w-full border-b border-zinc-800 mb-6">
         <button
-          className={`flex items-center px-6 py-3 border-b-2 transition-colors ${
-            activeTab === 'url'
-              ? 'border-blue-500 text-white'
-              : 'border-transparent text-zinc-400 hover:text-white'
-          }`}
+          className={`flex items-center px-6 py-3 border-b-2 transition-colors ${activeTab === 'url'
+            ? 'border-blue-500 text-white'
+            : 'border-transparent text-zinc-400 hover:text-white'
+            }`}
           onClick={() => setActiveTab('url')}
         >
           <Globe className="w-4 h-4 mr-2" />
           Website URLs
         </button>
         <button
-          className={`flex items-center px-6 py-3 border-b-2 transition-colors ${
-            activeTab === 'text'
-              ? 'border-blue-500 text-white'
-              : 'border-transparent text-zinc-400 hover:text-white'
-          }`}
+          className={`flex items-center px-6 py-3 border-b-2 transition-colors ${activeTab === 'text'
+            ? 'border-blue-500 text-white'
+            : 'border-transparent text-zinc-400 hover:text-white'
+            }`}
           onClick={() => setActiveTab('text')}
         >
           <FileText className="w-4 h-4 mr-2" />
           Text Content
         </button>
         <button
-          className={`flex items-center px-6 py-3 border-b-2 transition-colors ${
-            activeTab === 'file'
-              ? 'border-blue-500 text-white'
-              : 'border-transparent text-zinc-400 hover:text-white'
-          }`}
+          className={`flex items-center px-6 py-3 border-b-2 transition-colors ${activeTab === 'file'
+            ? 'border-blue-500 text-white'
+            : 'border-transparent text-zinc-400 hover:text-white'
+            }`}
           onClick={() => setActiveTab('file')}
         >
           <Upload className="w-4 h-4 mr-2" />
@@ -190,7 +188,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
               </Button>
             </div>
             <p className="text-sm text-zinc-500 mt-2">
-              Our Python backend will crawl and extract content from this website
+              we will crawl and extract content from this website
             </p>
           </div>
         </div>
@@ -229,14 +227,13 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
         <div className="space-y-4">
           <div className="bg-zinc-800/50 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Upload Documents</h3>
-            
+
             {/* Drag and Drop Area */}
             <div
-              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                dragActive 
-                  ? 'border-blue-500 bg-blue-500/10' 
-                  : 'border-zinc-600 hover:border-zinc-500'
-              }`}
+              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive
+                ? 'border-blue-500 bg-blue-500/10'
+                : 'border-zinc-600 hover:border-zinc-500'
+                }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
@@ -262,7 +259,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Upload className="w-4 h-4 mr-2" />
-                Choose Files
+                Browse Files
               </Button>
             </div>
 
@@ -302,9 +299,9 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
                       {item.title || item.content}
                     </p>
                     <p className="text-sm text-zinc-400">
-                      {item.type === 'url' ? item.content : 
-                       item.type === 'text' ? `${item.content.substring(0, 100)}...` :
-                       `${item.type.toUpperCase()} • ${item.fileSize ? Math.round(item.fileSize / 1024) + ' KB' : ''}`}
+                      {item.type === 'url' ? item.content :
+                        item.type === 'text' ? `${item.content.substring(0, 50)}...` :
+                          `${item.type.toUpperCase()} • ${item.fileSize ? Math.round(item.fileSize / 1024) + ' KB' : ''}`}
                     </p>
                     {item.status === 'processing' && (
                       <div className="flex items-center space-x-2 mt-1">

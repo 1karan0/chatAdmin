@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, description, avatar, config, theme, isPublic, knowledgeBase } = body;
+    const { name, description, avatar, config, theme, isPublic, knowledgeBase,tenant_id } = body;
 
     if (!name) {
       return NextResponse.json({ error: 'Bot name is required' }, { status: 400 });
@@ -63,6 +63,7 @@ export async function POST(request: NextRequest) {
     const bot = await prisma.bot.create({
   data: {
     name,
+    tenant_id: tenant_id || null,
     description: description || '',
     avatar: avatar || '',
     isPublic: isPublic || false,
@@ -74,7 +75,9 @@ export async function POST(request: NextRequest) {
         primaryColor: theme.primaryColor || '#0ea5e9',
         secondaryColor: theme.secondaryColor || '#64748b',
         backgroundColor: theme.backgroundColor || '#ffffff',
-        textColor: theme.textColor || '#1e293b',
+        yourtextColor: theme.yourtextColor || '#1e293b',
+        chattextColor: theme.chattextColor || '#ffffff',
+        bottomColor: theme.bottomColor || '#0ea5e9',
         fontFamily: theme.fontFamily || 'Inter',
         fontSize: theme.fontSize || '14px',
         borderRadius: theme.borderRadius || '8px',

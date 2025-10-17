@@ -1,5 +1,6 @@
 export interface Bot {
   id: string;
+  tenant_id: string;
   name: string;
   status: 'DRAFT' | 'PUBLISHED' | 'DEPLOYED' | 'ARCHIVED';
   deploymentUrl?: string;
@@ -63,6 +64,7 @@ export interface User {
   avatar: string;
   workspace: string;
   emailVerified: boolean;
+  tenantId?: string | null;
 }
 
 export interface BotFormData {
@@ -85,7 +87,9 @@ export interface BotTheme {
   primaryColor: string;
   secondaryColor: string;
   backgroundColor: string;
-  textColor: string;
+  yourtextColor: string;
+  chattextColor: string;
+  bottomColor: string;
   fontFamily: string;
   fontSize: string;
   borderRadius: string;
