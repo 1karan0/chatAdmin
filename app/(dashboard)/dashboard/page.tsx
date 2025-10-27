@@ -15,6 +15,8 @@ export default function Dashboard() {
   // Fetch bots data
   const { data: bots, loading: botsLoading, error: botsError, refetch: refetchBots } = useApi(getBots);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const backendBase = process.env.NEXT_PUBLIC_BACKEND_BASE || "http://localhost:8000";
+
 
   const handleCreateBot = () => {
     router.push('/create-bot');
@@ -30,6 +32,7 @@ export default function Dashboard() {
         method: 'DELETE',
       });
       if (res.ok) {
+        await fetch(`${backendBase}/auth/tenants/${bot?.tenant_id}`, { method: "DELETE" });
         setDeleteLoading(false);
         refetchBots();
       } else {
