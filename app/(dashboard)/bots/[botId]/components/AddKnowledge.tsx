@@ -6,6 +6,7 @@ import { Globe, FileText, Upload, Plus, Trash2, AlertCircle, File } from "lucide
 import { Button } from "@/components/common/components/Button";
 import toast, { Toaster } from "react-hot-toast";
 import { Bot } from "@/types";
+import { set } from "date-fns";
 
 export default function AddKnowledgePage({ bot }: { bot: Bot }) {
   const { botId } = useParams(); // 🧩 get bot ID from URL
@@ -16,6 +17,9 @@ export default function AddKnowledgePage({ bot }: { bot: Bot }) {
   const [knowledgeItems, setKnowledgeItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [urlLoading,setUrlLoading] = useState(false);
+  const [textLoading,setTextLoading] = useState(false);
+  const [fileLoading,setFileLoading] = useState(false);
 
   const backendurl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -31,6 +35,7 @@ export default function AddKnowledgePage({ bot }: { bot: Bot }) {
   // Add URL
   const addUrl = async () => {
     if (!urlInput.trim()) return;
+    setUrlLoading(true);
 
     try {
       const formData = new FormData();
@@ -42,11 +47,17 @@ export default function AddKnowledgePage({ bot }: { bot: Bot }) {
         body: formData, // ✅ send as FormData, not JSON
       });
 
-      if (!res.ok) throw new Error("Invalid URL");
+
+      if (!res.ok) {
+        setUrlLoading(false);
+        throw new Error("Invalid URL");
+      }
       const data = await res.json();
 
+      setUrlLoading(false);
       toast.success("URL added successfully!");
     } catch (err: any) {
+      setUrlLoading(false);
       console.error(err);
       toast.error("Invalid or failed URL");
     }
@@ -65,6 +76,7 @@ export default function AddKnowledgePage({ bot }: { bot: Bot }) {
   // Add Text
   const addText = async () => {
     if (!textInput.trim()) return;
+    setTextLoading(true);
 
     try {
       const formData = new FormData();
@@ -74,11 +86,16 @@ export default function AddKnowledgePage({ bot }: { bot: Bot }) {
         method: "POST",
         body: formData,
       });
-      if (!result.ok) throw new Error("Failed to add text knowledge");
+      if (!result.ok) {
+        setTextLoading(false);
+        throw new Error("Failed to add text knowledge");
+      }
       const data = await result.json();
+      setTextLoading(false);
       toast.success("Text knowledge added successfully!");
     }
     catch (err) {
+      setTextLoading(false);
       console.error(err);
       toast.error("Failed to add text knowledge");
     }
@@ -95,6 +112,7 @@ export default function AddKnowledgePage({ bot }: { bot: Bot }) {
 
   const addFile = async (file: File) => {
     try {
+      setFileLoading(true);
       const formData = new FormData();
       formData.append("file", file);
       formData.append("tenant_id", bot?.tenant_id); // must match FastAPI Form field
@@ -105,14 +123,17 @@ export default function AddKnowledgePage({ bot }: { bot: Bot }) {
       });
 
       if (!res.ok) {
+        setFileLoading(false);
         const errorData = await res.json();
         throw new Error(errorData.detail || "Failed to upload file");
       }
 
+      setFileLoading(false);
       const data = await res.json();
       console.log("File upload response:", data);
       toast.success("File uploaded successfully!");
     } catch (err: any) {
+      setFileLoading(false);
       console.error(err);
       toast.error(err.message || "Failed to upload file");
     }
@@ -247,7 +268,7 @@ export default function AddKnowledgePage({ bot }: { bot: Bot }) {
               className="flex-1 px-4 py-3 bg-black border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <Button onClick={addUrl} disabled={!urlInput.trim()} className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" /> Add URL
+              <Plus className="w-4 h-4 mr-2" /> {urlLoading ? "Adding..." : "Add URL"}
             </Button>
           </div>
         </div>
@@ -265,7 +286,7 @@ export default function AddKnowledgePage({ bot }: { bot: Bot }) {
             className="w-full px-4 py-3 bg-black border border-zinc-700 rounded-lg text-white placeholder-zinc-500 resize-none"
           />
           <Button onClick={addText} disabled={!textInput.trim()} className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="w-4 h-4 mr-2" /> Add Text
+            <Plus className="w-4 h-4 mr-2" /> {textLoading ? "Adding..." : "Add Text"}
           </Button>
         </div>
       )}
@@ -307,7 +328,7 @@ export default function AddKnowledgePage({ bot }: { bot: Bot }) {
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Upload className="w-4 h-4 mr-2" />
-                Browse Files
+                {fileLoading ? "Uploading..." : "Browse Files"}
               </Button>
             </div>
 
