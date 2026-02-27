@@ -544,7 +544,7 @@ export async function GET(
     isOpen = false;
   }
 
-  function addMessage(text, isUser = false, suggestions = []) {
+  function addMessage(text, isUser = false, suggestions = [], images = []) {
     const messagesContainer = document.getElementById('bp-messages');
     
     const wrapperDiv = document.createElement('div');
@@ -554,6 +554,46 @@ export async function GET(
     messageDiv.className = 'bp-message ' + (isUser ? 'bp-user-message' : 'bp-bot-message');
     messageDiv.textContent = text;
     wrapperDiv.appendChild(messageDiv);
+
+    // Add images (if any) for bot messages
+    if (!isUser && images && images.length > 0) {
+      const imagesDiv = document.createElement('div');
+      imagesDiv.style.display = 'flex';
+      imagesDiv.style.gap = '8px';
+      imagesDiv.style.flexWrap = 'wrap';
+      imagesDiv.style.marginTop = '8px';
+
+      images.forEach((img) => {
+        try {
+          const u = new URL(img.url);
+          if (u.protocol !== 'http:' && u.protocol !== 'https:') return;
+        } catch (e) {
+          return;
+        }
+
+        const btn = document.createElement('button');
+        btn.style.border = 'none';
+        btn.style.padding = '0';
+        btn.style.background = 'transparent';
+        btn.style.cursor = 'pointer';
+
+        const thumbnail = document.createElement('img');
+        thumbnail.src = img.url;
+        thumbnail.alt = img.alt || '';
+        thumbnail.style.width = '120px';
+        thumbnail.style.height = '80px';
+        thumbnail.style.objectFit = 'cover';
+        thumbnail.style.borderRadius = '6px';
+        thumbnail.loading = 'lazy';
+        thumbnail.onerror = function () { this.style.display = 'none'; };
+
+        btn.onclick = () => window.open(img.url, '_blank', 'noopener,noreferrer');
+        btn.appendChild(thumbnail);
+        imagesDiv.appendChild(btn);
+      });
+
+      wrapperDiv.appendChild(imagesDiv);
+    }
 
     // Add suggestions only for bot messages
     if (!isUser && suggestions && suggestions.length > 0) {
@@ -608,7 +648,7 @@ export async function GET(
       typingDiv.remove();
       
       if (data.answer) {
-        addMessage(data.answer, false, data.suggestions || []);
+        addMessage(data.answer, false, data.suggestions || [], data.images || []);
       } else {
         addMessage(data.detail || 'No response received.', false);
       }

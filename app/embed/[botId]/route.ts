@@ -403,20 +403,60 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
       this.style.height = Math.min(this.scrollHeight, 120) + 'px';
     });
 
-    function addMessage(text, isUser = false, suggestions = []) {
+    function addMessage(text, isUser = false, suggestions = [], images = []) {
       const wrapperDiv = document.createElement('div');
       wrapperDiv.className = 'message-wrapper ' + (isUser ? 'user' : 'bot');
-      
+
       const messageDiv = document.createElement('div');
       messageDiv.className = 'message ' + (isUser ? 'user' : 'bot');
       messageDiv.textContent = text;
       wrapperDiv.appendChild(messageDiv);
 
+      // Add images (if any) for bot messages
+      if (!isUser && images && images.length > 0) {
+        const imagesDiv = document.createElement('div');
+        imagesDiv.style.display = 'flex';
+        imagesDiv.style.gap = '8px';
+        imagesDiv.style.flexWrap = 'wrap';
+        imagesDiv.style.marginTop = '8px';
+
+        images.forEach((img) => {
+          try {
+            const u = new URL(img.url);
+            if (u.protocol !== 'http:' && u.protocol !== 'https:') return;
+          } catch (e) {
+            return;
+          }
+
+          const btn = document.createElement('button');
+          btn.style.border = 'none';
+          btn.style.padding = '0';
+          btn.style.background = 'transparent';
+          btn.style.cursor = 'pointer';
+
+          const thumbnail = document.createElement('img');
+          thumbnail.src = img.url;
+          thumbnail.alt = img.alt || '';
+          thumbnail.style.width = '120px';
+          thumbnail.style.height = '80px';
+          thumbnail.style.objectFit = 'cover';
+          thumbnail.style.borderRadius = '6px';
+          thumbnail.loading = 'lazy';
+          thumbnail.onerror = function () { this.style.display = 'none'; };
+
+          btn.onclick = () => window.open(img.url, '_blank', 'noopener,noreferrer');
+          btn.appendChild(thumbnail);
+          imagesDiv.appendChild(btn);
+        });
+
+        wrapperDiv.appendChild(imagesDiv);
+      }
+
       // Add suggestions only for bot messages
       if (!isUser && suggestions && suggestions.length > 0) {
         const suggestionsDiv = document.createElement('div');
         suggestionsDiv.className = 'suggestions-container';
-        
+
         suggestions.forEach((sugg) => {
           const btn = document.createElement('div');
           btn.className = 'suggestion-btn';
@@ -424,7 +464,7 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
           btn.onclick = () => sendMessage(sugg);
           suggestionsDiv.appendChild(btn);
         });
-        
+
         wrapperDiv.appendChild(suggestionsDiv);
       }
 
@@ -465,7 +505,7 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
         hideTyping();
         
         if (data.answer) {
-          addMessage(data.answer, false, data.suggestions || []);
+          addMessage(data.answer, false, data.suggestions || [], data.images || []);
         } else {
           addMessage(data.detail || 'Something went wrong.', false);
         }
