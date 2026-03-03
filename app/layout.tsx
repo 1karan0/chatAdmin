@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/chatbot-logo.png" />
-        <script src="https://chat-admin-silk.vercel.app/embed/524f06e7-9f12-4dec-a49e-d0e79fd48071/widget.js"></script> 
+        <script src="http://localhost:3000/embed/85114b6a-488f-42d7-b112-7f93fffccf1c/widget.js"></script>
       </head>
       <body className={`${inter.className} bg-zinc-900`}><DefaultLayout>{children}</DefaultLayout></body>
     </html>

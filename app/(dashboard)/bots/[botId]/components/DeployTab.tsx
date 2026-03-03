@@ -22,14 +22,14 @@ export default function DeployTab({ bot }: { bot: Bot }) {
           {bot.deploymentUrl && (
             <div className="mb-4">
               <label className="block text-sm font-medium text-zinc-300 mb-2">Bot URL</label>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-col gap-5 md:gap-0 md:flex-row items-center md:space-x-2">
                 <input
                   type="text"
                   value={bot.deploymentUrl}
                   readOnly
-                  className="flex-1 px-3 py-2 bg-black border border-zinc-600 rounded-md text-white"
+                  className="flex-1  px-3 py-2 bg-black border border-zinc-600 rounded-md text-white"
                 />
-                <Button onClick={() => window.open(bot.deploymentUrl!, "_blank")} className="bg-blue-600 hover:bg-blue-700">
+                <Button onClick={() => window.open(bot.deploymentUrl!, "_blank")} className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto">
                   Open
                 </Button>
               </div>
@@ -42,11 +42,26 @@ export default function DeployTab({ bot }: { bot: Bot }) {
           <div className="bg-black border rounded-lg p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Embed Code</h3>
             <p className="text-zinc-400 mb-4">Copy this code to embed the chat widget on your website:</p>
-            <div className="bg-zinc-900 rounded-lg p-4">
-              <code className="text-green-400 text-sm">
-                {`<script src="${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/embed/${bot.id}/widget.js"></script>`}
-              </code>
-            </div>
+            {/** build embed script once for reuse */}
+            {(() => {
+              const embedCode = `<script src="${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/embed/${bot.id}/widget.js"></script>`;
+              return (
+                <>
+                  <div className="bg-zinc-900 rounded-lg p-4">
+                    <code className="text-green-400 text-sm sm:text-wrap break-all">
+                      {embedCode}
+                    </code>
+                  </div>
+                  <Button
+                    onClick={() => navigator.clipboard.writeText(embedCode)}
+                    variant="default"
+                    className="mt-3 w-full md:w-auto"
+                  >
+                    Copy
+                  </Button>
+                </>
+              );
+            })()}
           </div>
         )
 
@@ -63,7 +78,7 @@ export default function DeployTab({ bot }: { bot: Bot }) {
               readOnly
               className="flex-1 px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white font-mono text-sm"
             />
-            <Button onClick={() => navigator.clipboard.writeText(bot.apiKey)} variant="outline">
+            <Button onClick={() => navigator.clipboard.writeText(bot.apiKey)} variant="outline" >
               Copy
             </Button>
           </div>

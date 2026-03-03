@@ -395,7 +395,22 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
     const sendButton = document.getElementById('sendButton');
     const typingIndicator = document.getElementById('typing');
 
-    const sessionId = 'session_' + Math.random().toString(36).substring(2, 15);
+    // persistent chat session for this tenant
+    let chatSessionId ;
+
+    async function initSession() {
+      if (chatSessionId || !tenantId) return;
+      try {
+        const res = await fetch('https://chatbotbackend-grm3.onrender.com/chat/session?tenant_id=' + tenantId);
+        const data = await res.json();
+        if (data.session_id) {
+          chatSessionId = data.session_id;
+          localStorage.setItem('chatSession_', chatSessionId);
+        }
+      } catch (e) {
+        console.error('Failed to init chat session', e);
+      }
+    }
 
     // Auto-resize textarea
     messageInput.addEventListener('input', function() {
@@ -485,6 +500,9 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
       const message = text || messageInput.value.trim();
       if (!message) return;
 
+      // make sure we have a session before asking
+      await initSession();
+
       addMessage(message, true);
       messageInput.value = '';
       messageInput.style.height = 'auto';
@@ -497,7 +515,8 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             question: message,
-            tenant_id: tenantId
+            tenant_id: tenantId,
+            session_id: chatSessionId
           }),
         });
 
@@ -527,7 +546,7 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
       }
     });
 
-    // Automatically send "hi" when chat loads
+    // send greeting once on first load (no conversation retrieval)
     window.addEventListener('load', () => {
       setTimeout(() => {
         sendMessage('hi');
