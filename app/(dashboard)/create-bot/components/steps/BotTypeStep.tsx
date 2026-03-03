@@ -59,7 +59,7 @@ export default function BotTypeStep({ formData, updateFormData }: Props) {
             <div
               key={botType.id}
               onClick={() => updateFormData("botType", botType.id)}
-              className={`p-3  border rounded-lg cursor-pointer transition-all group hover:bg-zinc-800 transition-all duration-300 ${formData.botType === botType.id
+              className={`p-3  border rounded-lg cursor-pointer  group hover:bg-zinc-800 transition-all duration-300 ${formData.botType === botType.id
                 ? "border-blue-500 bg-blue-500/10 transition-all duration-300"
                 : "border-zinc-600 group-hover:bg-zinc-500 transition-all duration-300"
                 }`}

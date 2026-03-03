@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Globe, FileText, Plus, Trash2, Upload, Link, File, AlertCircle } from "lucide-react";
+import CustomDropdown from "../../../../../components/common/components/CustomDropdown";
 import { Button } from "@/components/common/components/Button";
 import { BotFormData } from "../CreateBotWizard";
 import { useSession } from "next-auth/react";
@@ -15,6 +16,12 @@ interface Props {
 
 export default function KnowledgeStep({ formData, updateFormData }: Props) {
   const [activeTab, setActiveTab] = useState<'url' | 'text' | 'file'>('url');
+
+  const tabs = [
+    { id: 'url', name: 'Website URLs', icon: Globe },
+    { id: 'text', name: 'Text Content', icon: FileText },
+    { id: 'file', name: 'Upload Files', icon: Upload },
+  ];
   const [urlInput, setUrlInput] = useState('');
   const [textInput, setTextInput] = useState('');
   const [textTitle, setTextTitle] = useState('');
@@ -132,7 +139,17 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
       </div>
 
       {/* Tab Selection */}
-      <div className="flex w-full border-b border-zinc-800 mb-6">
+      {/* mobile dropdown */}
+      <div className="block sm:hidden mb-6">
+        <CustomDropdown
+          tabs={tabs}
+          activeTab={activeTab}
+          setActiveTab={(tab: string) => setActiveTab(tab as 'url' | 'text' | 'file')}
+        />
+      </div>
+
+      {/* desktop tabs */}
+      <div className="hidden sm:flex w-full border-b border-zinc-800 mb-6">
         <button
           className={`flex items-center px-6 py-3 border-b-2 transition-colors ${activeTab === 'url'
             ? 'border-blue-500 text-white'
@@ -170,7 +187,7 @@ export default function KnowledgeStep({ formData, updateFormData }: Props) {
         <div className="space-y-4">
           <div className="bg-zinc-800/50 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Add Website URL</h3>
-            <div className="flex gap-3">
+            <div className="flex flex-col md:flex-row gap-3">
               <input
                 type="url"
                 value={urlInput}

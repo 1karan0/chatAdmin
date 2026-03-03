@@ -51,6 +51,23 @@ export async function GET(
   let isOpen = false;
   let hasInteracted = false;
 
+  // persistent chat session for this tenant
+  let chatSessionId;
+
+  async function initSession() {
+    if (chatSessionId || !tenantId) return;
+    try {
+      const res = await fetch('https://chatbotbackend-grm3.onrender.com/chat/session?tenant_id=' + tenantId);
+      const data = await res.json();
+      if (data.session_id) {
+        chatSessionId = data.session_id;
+        localStorage.setItem('chatSession_', chatSessionId);
+      }
+    } catch (e) {
+      console.error('Failed to init chat session', e);
+    }
+  }
+
   function createWidget() {
     const position = theme.chatPosition === 'bottom-left' ? 'left: 20px;' : 'right: 20px;';
     const chatAlign = theme.chatPosition === 'bottom-left' ? 'left: 0;' : 'right: 0;';
@@ -438,12 +455,27 @@ export async function GET(
 
         /* Mobile Responsive */
         @media (max-width: 480px) {
+          /* Make the entire widget container stay inside the viewport */
+          #bp-widget {
+            bottom: 10px !important;
+            left: 10px !important;
+            right: 10px !important;
+            /* ensure no horizontal overflow */
+          }
+
+          /* slightly smaller toggle button on mobiles */
+          #bp-chat-button {
+            width: 56px !important;
+            height: 56px !important;
+          }
+
           #bp-chat-window {
             width: calc(100vw - 20px) !important;
             height: calc(100vh - 100px) !important;
             bottom: 10px !important;
-            left: 10px !important;
-            right: 10px !important;
+            /* remove left/right offsets coming from chatAlign so window spans container */
+            left: 0 !important;
+            right: 0 !important;
             border-radius: 12px !important;
           }
         }
@@ -478,7 +510,7 @@ export async function GET(
       setTimeout(() => ripple.classList.remove('active'), 600);
     });
 
-    // Automatically send "hi" when widget loads
+    // send an initial greeting once when widget is created
     setTimeout(() => {
       sendMessage('hi');
     }, 800);
@@ -625,6 +657,9 @@ export async function GET(
     const message = text || input.value.trim();
     if (!message) return;
 
+    // ensure the session exists before sending
+    await initSession();
+
     input.value = '';
     input.style.height = 'auto';
     sendBtn.disabled = true;
@@ -638,10 +673,10 @@ export async function GET(
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
     try {
-      const response = await fetch('http://localhost:8000/chat/ask', {
+      const response = await fetch('https://chatbotbackend-grm3.onrender.com/chat/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: message, tenant_id: tenantId }),
+        body: JSON.stringify({ question: message, tenant_id: tenantId, session_id: chatSessionId }),
       });
 
       const data = await response.json();

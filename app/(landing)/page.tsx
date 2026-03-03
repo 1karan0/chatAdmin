@@ -114,12 +114,22 @@ export default function LandingPage() {
                 Get Started
               </Button>
             </div>
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Button
+                variant="outline"
+                onClick={() => setShowAuthModal(true)}
+                className="border-zinc-600 text-zinc-300 hover:text-white"
+              >
+                Sign In
+              </Button>
+            </div>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className=" py-10 md:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <div className="mb-8">
             <div className="inline-flex items-center px-4 py-2 bg-blue-900/20 border border-blue-500/20 rounded-full text-blue-300 text-sm mb-6">
@@ -157,7 +167,7 @@ export default function LandingPage() {
 
           {/* Hero Image/Video Placeholder */}
           <div className="relative max-w-3xl mx-auto">
-            <div className="bg-gradient-to-r from-blue-900/20 to-blue-900/20 rounded-2xl border border-zinc-800 p-8">
+            <div className="bg-gradient-to-r from-blue-900/20 to-blue-900/20 rounded-2xl border border-zinc-800 p-3 md:p-8">
               <div className="bg-black rounded-xl border border-zinc-700 p-6">
                 <div className="flex items-center space-x-2 mb-4">
                   <div className="w-3 h-3 bg-red-500 rounded-full"></div>
@@ -195,7 +205,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 bg-zinc-900/50">
+      <section id="features" className=" py-10 md:py-20 px-4 sm:px-6 lg:px-8 bg-zinc-900/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Everything you need to build amazing chatbots</h2>

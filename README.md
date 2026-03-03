@@ -159,7 +159,30 @@ Optimized for scalability:
 - `POST /api/bots/[id]/deploy` - Bot deployment
 - `POST /api/upload` - File uploads
 - `POST /api/knowledge/process` - Knowledge processing
-- `POST /api/chat/[botId]` - Chat interactions
+- `POST /api/chat/[botId]` - Chat interactions (expects `sessionId` field from the client)
+
+### Chat session flow (Python backend)
+The frontend must request a **per‑chat session ID** from the external backend and
+reuse it for every message and history lookup:
+
+1. **Create / fetch a chat session** – called once when a user opens a chat:
+   ```bash
+   GET /chat/session?tenant_id={tenant_id}
+   ```
+   Response includes `{ "session_id": "..." }`.  Store this value in React
+   state or `localStorage` (key it by tenant).
+2. **Send messages** – include the same `session_id` in every POST to
+   `/api/chat/[botId]` (body field `sessionId`).
+3. **Load history** – call the backend directly:
+   ```bash
+   GET /chat/conversation?tenant_id={tenant_id}&session_id={session_id}
+   ```
+   Use the same `session_id` obtained earlier; if you don’t supply one the
+   backend will generate a fresh id and the conversation will appear empty.
+
+Our dashboard example (`app/(dashboard)/bots/[botId]/page.tsx`) shows how to
+initialise and persist the session ID, and how to use it when fetching the
+conversation.
 
 ## Deployment
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Layout from "@/components/layout/Layout";
 import BotHeader from "./components/BotHeader";
 import BotTabs from "./components/BotTabs";
@@ -10,10 +11,19 @@ import AnalyticsTab from "./components/AnalyticsTab";
 import DeployTab from "./components/DeployTab";
 import { Bot } from "@/types";
 import Addknowledge from "./components/AddKnowledge";
+import Conversation from "./components/conversation";
 
 export default function BotEditorPage() {
   const params = useParams();
   const router = useRouter();
+  const { data: session } = useSession();
+  const sessionId = session?.user?.id || null;
+
+  const backendBase = process.env.NEXT_PUBLIC_BACKEND_BASE || "http://localhost:8000";
+
+  // unique chat session we get from the Python backend and persist per tenant
+  const [chatSessionId, setChatSessionId] = useState<string>("");
+
 
   const [bot, setBot] = useState<Bot | null>(null);
   const [loading, setLoading] = useState(true);
@@ -21,8 +31,28 @@ export default function BotEditorPage() {
   const [deploying, setDeploying] = useState(false);
   const [activeTab, setActiveTab] = useState("settings");
   const [deletLoading, setDeleteLoading] = useState(false);
+  const [conversation, setConversation] = useState<any>(null);
 
-  const backendBase = process.env.NEXT_PUBLIC_BACKEND_BASE || "http://localhost:8000";
+    useEffect(() => {
+    if (!bot?.tenant_id) return;
+
+    const key = `chatSession_`;
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      setChatSessionId(stored);
+      return;
+    }
+
+    fetch(`${backendBase}/chat/session?tenant_id=${bot.tenant_id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.session_id) {
+          localStorage.setItem(key, data.session_id);
+          setChatSessionId(data.session_id);
+        }
+      })
+      .catch((err) => console.error("failed to init chat session", err));
+  }, [bot?.tenant_id]);
 
   useEffect(() => {
     fetchBot();
@@ -95,6 +125,29 @@ export default function BotEditorPage() {
     }
   };
 
+  const getConversation = async () => {
+    if (!bot?.tenant_id || !chatSessionId) return;
+
+    try {
+      const url = new URL(`${backendBase}/chat/conversations`);
+      url.searchParams.set("tenant_id", bot.tenant_id);
+      
+
+      const response = await fetch(url.toString());
+      if (response.ok) {
+        const data = await response.json();
+        setConversation(data);
+      }
+    } catch (err) {
+      console.error("Error fetching conversation:", err);
+    }
+  };
+
+  // fetch conversation whenever tenant or chat session changes
+  useEffect(() => {
+    getConversation();
+  }, [bot?.tenant_id, chatSessionId]);
+
   if (loading) {
     return (
       <Layout>
@@ -138,6 +191,7 @@ export default function BotEditorPage() {
           {activeTab === "analytics" && <AnalyticsTab bot={bot} />}
           {activeTab === "deploy" && <DeployTab bot={bot} />}
           {activeTab === "integrations" && <Addknowledge bot = {bot}/>}
+          {activeTab === "conversation" && <Conversation bot={bot} conversation={conversation} />}
         </div>
       </div>
     </Layout>
