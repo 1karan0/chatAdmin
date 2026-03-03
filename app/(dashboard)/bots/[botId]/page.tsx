@@ -19,7 +19,7 @@ export default function BotEditorPage() {
   const { data: session } = useSession();
   const sessionId = session?.user?.id || null;
 
-  const backendBase = process.env.NEXT_PUBLIC_BACKEND_BASE || "http://localhost:8000";
+  const backendBase = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   // unique chat session we get from the Python backend and persist per tenant
   const [chatSessionId, setChatSessionId] = useState<string>("");
