@@ -83,7 +83,7 @@ export default function MainContent({
 
             <div className="space-y-3">
               {bots.slice(0, 3).map((bot) => (
-                <div key={bot.id} className="bg-black rounded-lg border border-zinc-700 p-4 hover:bg-zinc-750 transition-colors">
+                <div key={bot.id} className="bg-black rounded-lg border border-zinc-700 p-4 hover:bg-gradient-to-b from-zinc-900 to-[#112c5c] transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -93,10 +93,7 @@ export default function MainContent({
                         <h3 className="text-white font-medium">{bot.name}</h3>
                         <div className="flex items-center space-x-4 text-sm text-zinc-400">
                           <span className="flex items-center space-x-1">
-                            <span>{bot.views} views</span>
-                          </span>
-                          <span className="flex items-center space-x-1">
-                            <span>{bot.likes} likes</span>
+                            <span>{bot.description ? bot.description : 'No description available'}</span>
                           </span>
                         </div>
                       </div>

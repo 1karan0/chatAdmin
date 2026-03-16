@@ -95,7 +95,7 @@ export default function BotCard({
 
   return (
     <>
-      <div className="bg-black border border-zinc-700 rounded-lg p-6 hover:border-blue-500/50 transition-all group">
+      <div className="bg-black border border-zinc-700 rounded-lg p-6 hover:bg-gradient-to-b from-zinc-900 to-[#112c5c] group">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
