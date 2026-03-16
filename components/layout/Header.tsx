@@ -75,7 +75,7 @@ export default function Header({ onMobileMenuToggle, sidebarCollapsed }: HeaderP
              
 
               {/* Notifications */}
-              <div className="relative">
+              {/* <div className="relative">
                 <button className="text-zinc-400 hover:text-white p-2 rounded-md hover:bg-black transition-colors">
                   <Bell className="h-5 w-5" />
                   {notifications > 0 && (
@@ -84,7 +84,7 @@ export default function Header({ onMobileMenuToggle, sidebarCollapsed }: HeaderP
                     </span>
                   )}
                 </button>
-              </div>
+              </div> */}
 
               {/* User Profile */}
              {session?( <div className="flex items-center space-x-4">
