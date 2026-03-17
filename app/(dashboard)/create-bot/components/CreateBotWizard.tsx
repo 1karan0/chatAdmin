@@ -21,7 +21,10 @@ export interface BotFormData {
   // Basic Info
   name: string;
   description: string;
-  botType: string;
+  websiteType: string;
+  primaryGoal: string;
+  tone: string;
+  extraInstructions: string;
   tenantId?: string;
 
   // Knowledge Base
@@ -61,7 +64,10 @@ export interface BotFormData {
 const initialFormData: BotFormData = {
   name: "",
   description: "",
-  botType: "",
+  websiteType: "",
+  primaryGoal: "",
+  tone: "",
+  extraInstructions: "",
   knowledgeBase: [],
   theme: {
     primaryColor: "#0ea5e9",
@@ -103,7 +109,7 @@ export default function CreateBotWizard() {
   const validateStep = (step: number): boolean => {
     switch (step) {
       case 1:
-        return !!(formData.botType && formData.name.trim());
+        return !!(formData.websiteType && formData.name.trim());
       case 2:
         return true;
       case 3:
@@ -185,7 +191,12 @@ export default function CreateBotWizard() {
         body: JSON.stringify({
           name: formData.name,
           description: formData.description,
-          config: { botType: formData.botType, tags: formData.tags },
+          config: { 
+            websiteType: formData.websiteType, 
+            primaryGoal: formData.primaryGoal, 
+            tone: formData.tone, 
+            extraInstructions: formData.extraInstructions 
+          },
           theme: formData.theme,
           isPublic: formData.isPublic,
           knowledgeBase: formData.knowledgeBase,

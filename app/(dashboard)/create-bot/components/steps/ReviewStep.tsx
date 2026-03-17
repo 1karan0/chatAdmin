@@ -64,7 +64,7 @@ export default function ReviewStep({ formData }: Props) {
             </div>
             <div>
               <label className="text-sm text-zinc-400">Bot Type</label>
-              <p className="text-white font-medium">{getBotTypeName(formData.botType)}</p>
+              <p className="text-white font-medium">{getBotTypeName(formData.websiteType)}</p>
             </div>
             {formData.description && (
               <div className="md:col-span-2">
