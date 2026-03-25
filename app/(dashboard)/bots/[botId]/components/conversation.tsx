@@ -203,7 +203,7 @@ export default function Conversation({ bot, conversation }: ConversationProps) {
             {/* Chat Window */}
             <div className="flex justify-center w-full mt-6 md:mt-0">
               <div
-                className="w-full  lg:w-1/2 p-4 rounded-lg shadow-lg h-[60vh] overflow-y-auto"
+                className="w-full  lg:w-full p-4 rounded-lg shadow-lg h-[60vh] overflow-y-auto"
                 style={{ backgroundColor: theme?.backgroundColor }}
               >
                 {renderMessages(selected)}

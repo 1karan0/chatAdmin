@@ -16,6 +16,7 @@ import BotTypeStep from "./steps/BotTypeStep";
 import KnowledgeStep from "./steps/KnowledgeStep";
 import ThemeStep from "./steps/ThemeStep";
 import ReviewStep from "./steps/ReviewStep";
+import { useSession } from "next-auth/react";
 
 export interface BotFormData {
   // Basic Info
@@ -102,6 +103,8 @@ export default function CreateBotWizard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const { data: session } = useSession();
+  const userId = session?.user?.id
   const updateFormData = (field: keyof BotFormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -154,7 +157,7 @@ export default function CreateBotWizard() {
         body: JSON.stringify({
           tenant_id: tenantId,
           tenant_name: `${formData.name}-tenant`,
-          username: "frontend_user",
+          user_id: userId, 
         }),
       });
 
