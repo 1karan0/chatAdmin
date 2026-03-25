@@ -57,7 +57,7 @@ export async function GET(
   async function initSession() {
     if (chatSessionId || !tenantId) return;
     try {
-      const res = await fetch('http://localhost:8000/chat/session?tenant_id=' + tenantId);
+      const res = await fetch('https://chatbotbackend-grm3.onrender.com/session?tenant_id=' + tenantId);
       const data = await res.json();
       if (data.session_id) {
         chatSessionId = data.session_id;
@@ -576,6 +576,11 @@ export async function GET(
     isOpen = false;
   }
 
+  function linkify(text) {
+    const urlRegex = new RegExp('(https?://[^\\s()]+|mailto:[^\\s()]+)', 'g');
+    return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+  }
+
   function addMessage(text, isUser = false, suggestions = [], images = []) {
     const messagesContainer = document.getElementById('bp-messages');
     
@@ -584,7 +589,7 @@ export async function GET(
     
     const messageDiv = document.createElement('div');
     messageDiv.className = 'bp-message ' + (isUser ? 'bp-user-message' : 'bp-bot-message');
-    messageDiv.textContent = text;
+    messageDiv.innerHTML = linkify(text);
     wrapperDiv.appendChild(messageDiv);
 
     // Add images (if any) for bot messages
@@ -673,7 +678,7 @@ export async function GET(
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
     try {
-      const response = await fetch('http://localhost:8000/chat/ask', {
+      const response = await fetch('https://chatbotbackend-grm3.onrender.com/chat/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: message, tenant_id: tenantId, session_id: chatSessionId }),
