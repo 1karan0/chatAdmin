@@ -57,7 +57,7 @@ export async function GET(
   async function initSession() {
     if (chatSessionId || !tenantId) return;
     try {
-      const res = await fetch('https://chatbotbackend-grm3.onrender.com/session?tenant_id=' + tenantId);
+      const res = await fetch('https://chatbotbackend-grm3.onrender.com/chat/session?tenant_id=' + tenantId);
       const data = await res.json();
       if (data.session_id) {
         chatSessionId = data.session_id;
