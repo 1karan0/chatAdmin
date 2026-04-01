@@ -57,7 +57,7 @@ export async function GET(
   async function initSession() {
     if (chatSessionId || !tenantId) return;
     try {
-      const res = await fetch('http://localhost:8000/chat/session?tenant_id=' + tenantId);
+      const res = await fetch('https://chatbotbackend-grm3.onrender.com/chat/session?tenant_id=' + tenantId);
       const data = await res.json();
       if (data.session_id) {
         chatSessionId = data.session_id;
@@ -673,7 +673,7 @@ export async function GET(
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
     try {
-      const response = await fetch('http://localhost:8000/chat/ask', {
+      const response = await fetch('https://chatbotbackend-grm3.onrender.com/chat/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: message, tenant_id: tenantId, session_id: chatSessionId }),
