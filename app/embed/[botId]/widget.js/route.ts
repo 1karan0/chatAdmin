@@ -34,7 +34,7 @@ export async function GET(
       }
     }
 
-    const theme = bot.theme || {};
+    const theme: any = bot.theme || {};
     const tenantId = bot.tenant_id || '';
     const botName = bot.name || 'Chat Bot';
 
@@ -52,8 +52,14 @@ export async function GET(
   let hasInteracted = false;
 
   // persistent chat session for this tenant
-  let chatSessionId;
+  let chatSessionId;    let isProcessingRequest = false;
 
+    function setSuggestionsEnabled(enabled) {
+      document.querySelectorAll('.bp-suggestion-btn').forEach((btn) => {
+        btn.style.pointerEvents = enabled ? 'auto' : 'none';
+        btn.style.opacity = enabled ? '1' : '0.5';
+      });
+    }
   async function initSession() {
     if (chatSessionId || !tenantId) return;
     try {
@@ -317,10 +323,19 @@ export async function GET(
           padding: 12px 16px;
           border-radius: 16px;
           word-wrap: break-word;
-          font-size: \${theme.fontSize || '14px'};
+          overflow-wrap: anywhere;
+          font-size: ${theme.fontSize || '14px'};
           line-height: 1.5;
           position: relative;
           box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .bp-message a {
+          color: inherit;
+          text-decoration: underline;
+          overflow-wrap: anywhere;
+          word-break: break-all;
+          white-space: normal;
         }
 
         .bp-user-message {
@@ -577,8 +592,9 @@ export async function GET(
   }
 
   function linkify(text) {
-    const urlRegex = new RegExp('(https?://[^\\s()]+|mailto:[^\\s()]+)', 'g');
-    return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+    const normalized = text.replace(/(https?:\\/\\/\\S*?)-\\s+(\\S+)/g, '$1-$2');
+    const urlRegex = new RegExp('(https?://[^\\\\s()]+|mailto:[^\\\\s()]+)', 'g');
+    return normalized.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
   }
 
   function addMessage(text, isUser = false, suggestions = [], images = []) {
@@ -641,7 +657,11 @@ export async function GET(
         const btn = document.createElement('div');
         btn.className = 'bp-suggestion-btn';
         btn.textContent = sugg;
-        btn.onclick = () => sendMessage(sugg);
+        btn.onclick = () => {
+          if (isProcessingRequest) return;
+          setSuggestionsEnabled(false);
+          sendMessage(sugg);
+        };
         suggestionsDiv.appendChild(btn);
       });
       
@@ -657,10 +677,14 @@ export async function GET(
   }
 
   async function sendMessage(text = null) {
+    if (isProcessingRequest) return;
     const input = document.getElementById('bp-message-input');
     const sendBtn = document.getElementById('bp-send-button');
     const message = text || input.value.trim();
     if (!message) return;
+
+    isProcessingRequest = true;
+    setSuggestionsEnabled(false);
 
     // ensure the session exists before sending
     await initSession();
@@ -696,6 +720,8 @@ export async function GET(
       typingDiv.remove();
       addMessage('Sorry, something went wrong. Please try again.', false);
     } finally {
+      isProcessingRequest = false;
+      setSuggestionsEnabled(true);
       sendBtn.disabled = false;
       input.focus();
     }

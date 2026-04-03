@@ -170,8 +170,17 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
       font-size: ${bot?.theme?.fontSize || '14px'};
       line-height: 1.5;
       word-wrap: break-word;
+      overflow-wrap: anywhere;
       position: relative;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .message a {
+      color: inherit;
+      text-decoration: underline;
+      overflow-wrap: anywhere;
+      word-break: break-all;
+      white-space: normal;
     }
 
     .message.bot {
@@ -396,7 +405,15 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
     const typingIndicator = document.getElementById('typing');
 
     // persistent chat session for this tenant
-    let chatSessionId ;
+    let chatSessionId;
+    let isProcessingRequest = false;
+
+    function setSuggestionsEnabled(enabled) {
+      document.querySelectorAll('.suggestion-btn').forEach((btn) => {
+        btn.style.pointerEvents = enabled ? 'auto' : 'none';
+        btn.style.opacity = enabled ? '1' : '0.5';
+      });
+    }
 
     async function initSession() {
       if (chatSessionId || !tenantId) return;
@@ -419,8 +436,9 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
     });
 
     function linkify(text) {
-      const urlRegex = new RegExp('(https?://[^\\s()]+|mailto:[^\\s()]+)', 'g');
-      return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+      const normalized = text.replace(/(https?:\\/\\/\\S*?)-\\s+(\\S+)/g, '$1-$2');
+      const urlRegex = new RegExp('(https?://[^\\\\s()]+|mailto:[^\\\\s()]+)', 'g');
+      return normalized.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
     }
 
     function addMessage(text, isUser = false, suggestions = [], images = []) {
@@ -482,7 +500,11 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
           const btn = document.createElement('div');
           btn.className = 'suggestion-btn';
           btn.textContent = sugg;
-          btn.onclick = () => sendMessage(sugg);
+          btn.onclick = () => {
+            if (isProcessingRequest) return;
+            setSuggestionsEnabled(false);
+            sendMessage(sugg);
+          };
           suggestionsDiv.appendChild(btn);
         });
 
@@ -503,8 +525,12 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
     }
 
     async function sendMessage(text = null) {
+      if (isProcessingRequest) return;
       const message = text || messageInput.value.trim();
       if (!message) return;
+
+      isProcessingRequest = true;
+      setSuggestionsEnabled(false);
 
       // make sure we have a session before asking
       await initSession();
@@ -538,10 +564,12 @@ export async function GET(request: NextRequest, context: EmbedRouteContext) {
       } catch (err) {
         hideTyping();
         addMessage('Network error, please try again.', false);
+      } finally {
+        isProcessingRequest = false;
+        setSuggestionsEnabled(true);
+        sendButton.disabled = false;
+        messageInput.focus();
       }
-
-      sendButton.disabled = false;
-      messageInput.focus();
     }
 
     sendButton.addEventListener('click', () => sendMessage());
